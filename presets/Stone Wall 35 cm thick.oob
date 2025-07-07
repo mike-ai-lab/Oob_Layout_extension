@@ -1,0 +1,14 @@
+Oob preset parameters;Stone Wall 35 cm thick;
+@@i_unit;4;
+@@f_longueurBardage;0.4;
+@@f_hauteurBardage;0.1;
+@@f_randomlongueurBardage;0.5;
+@@f_randomhauteurBardage;0.5;
+@@f_randomepaisseurBardage;0.1;
+@@f_epaisseurBardage;0.35;
+@@f_jointLongueur;0.005;
+@@f_jointLargeur;0.005;
+@@f_jointProfondeur;0.005;
+@@f_decalageRangees;0.2;
+@@s_colorname;227,210,149;
+@@i_startpoint;1;

@@ -1,0 +1,14 @@
+Oob preset parameters;Tiling 27 cm;
+@@i_unit;4;
+@@f_longueurBardage;0.27;
+@@f_hauteurBardage;0.15;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.005;
+@@f_jointLargeur;0.005;
+@@f_jointProfondeur;0.005;
+@@f_decalageRangees;0.09;
+@@s_colorname;180,90,60;
+@@i_startpoint;2;

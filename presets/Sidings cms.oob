@@ -1,0 +1,13 @@
+Oob preset parameters;Sidings cms;
+@@i_unit;3;
+@@f_longueurBardage;300.0;
+@@f_hauteurBardage;13.0;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;1.0;
+@@f_jointLongueur;0.5;
+@@f_jointLargeur;0.5;
+@@f_jointProfondeur;0.5;
+@@f_decalageRangees;123.0;
+@@s_colorname;200,200,200;

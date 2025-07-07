@@ -1,0 +1,18 @@
+Oob preset parameters;Custom Pattern 45-30-15;
+@@i_unit;4;
+@@f_longueurBardage;0.8;0.9;1.0;1.1;1.2;
+@@f_hauteurBardage;0.45;0.3;0.15;
+@@f_randomlongueurBardage;1;
+@@f_randomhauteurBardage;0;
+@@f_layeroffset;0.0;
+@@f_heightoffset;0.45
+@@f_lengthoffset;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_randomColor;0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.003;
+@@f_jointLargeur;0.003;
+@@f_jointProfondeur;0.0;
+@@f_decalageRangees;0.0;
+@@s_colorname;<auto>34;
+@@i_startpoint;1;

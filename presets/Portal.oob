@@ -1,0 +1,13 @@
+Oob preset parameters;Portal;
+@@i_unit;4;
+@@f_longueurBardage;0.15;
+@@f_hauteurBardage;4.0;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.02;
+@@f_jointLargeur;0.0;
+@@f_jointProfondeur;0.0;
+@@f_decalageRangees;0.0;
+@@s_colorname;255,255,255;

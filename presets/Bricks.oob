@@ -1,0 +1,12 @@
+Oob preset parameters;Bricks;
+@@f_longueurBardage;0.2;
+@@f_hauteurBardage;0.1;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.15;
+@@f_jointLongueur;0.005;
+@@f_jointLargeur;0.005;
+@@f_jointProfondeur;0.005;
+@@f_decalageRangees;0.1;
+@@s_colorname;190,90,12;

@@ -1,0 +1,12 @@
+Oob preset parameters;Pavement half offset;
+@@f_longueurBardage;0.4;
+@@f_hauteurBardage;0.4;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.005;
+@@f_jointLargeur;0.005;
+@@f_jointProfondeur;0.005;
+@@f_decalageRangees;0.2;
+@@s_colorname;Oob-1;

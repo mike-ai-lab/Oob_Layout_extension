@@ -1,0 +1,17 @@
+Oob preset parameters;Wall siding joists;
+@@i_unit;4;
+@@f_longueurBardage;0.1;
+@@f_hauteurBardage;4.0;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_layeroffset;0.1;
+@@f_heightoffset;0.0;
+@@f_lengthoffset;0.15;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.1;
+@@f_jointLongueur;0.5;
+@@f_jointLargeur;0.0;
+@@f_jointProfondeur;0.0;
+@@f_decalageRangees;0.0;
+@@s_colorname;255,255,255;
+@@i_startpoint;2;

@@ -1,0 +1,17 @@
+Oob preset parameters;Vapor barrier;
+@@i_unit;4;
+@@f_longueurBardage;1.0;
+@@f_hauteurBardage;4.0;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_layeroffset;0.55;
+@@f_heightoffset;0.0;
+@@f_lengthoffset;0.15;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.01;
+@@f_jointLongueur;0.0;
+@@f_jointLargeur;0.0;
+@@f_jointProfondeur;0.0;
+@@f_decalageRangees;0.0;
+@@s_colorname;200,200,200;
+@@i_startpoint;2;

@@ -1,0 +1,12 @@
+Oob preset parameters;Vertical PVC 20 cm;
+@@f_longueurBardage;2.0;
+@@f_hauteurBardage;0.2;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.04;
+@@f_jointLargeur;0.04;
+@@f_jointProfondeur;0.0;
+@@f_decalageRangees;0.0;
+@@s_colorname;255,255,255;

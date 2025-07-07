@@ -1,0 +1,17 @@
+Oob preset parameters;Terrasse screws;
+@@i_unit;4;
+@@f_longueurBardage;0.01;
+@@f_hauteurBardage;0.01;
+@@f_randomlongueurBardage;0.0;
+@@f_randomhauteurBardage;0.0;
+@@f_layeroffset;-0.2;
+@@f_heightoffset;0.0;
+@@f_lengthoffset;0.15;
+@@f_randomepaisseurBardage;0.0;
+@@f_epaisseurBardage;0.06;
+@@f_jointLongueur;0.6;
+@@f_jointLargeur;0.07;
+@@f_jointProfondeur;0;
+@@f_decalageRangees;0;
+@@s_colorname;153,107,91;
+@@i_startpoint;2;
