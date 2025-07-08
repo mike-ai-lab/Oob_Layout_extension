@@ -359,6 +359,16 @@
                 </div>
             </div>
             
+            <!-- Layout Direction -->
+            <div class="col-span-2">
+                <label class="form-label">Layout Direction</label>
+                <div class="flex radio-group">
+                    <input type="radio" name="layoutdir" id="layoutHorizontal" value="horizontal" checked>
+                    <label for="layoutHorizontal" title="Lay stones horizontally">Horizontal</label>
+                    <input type="radio" name="layoutdir" id="layoutVertical" value="vertical">
+                    <label for="layoutVertical" title="Lay stones vertically">Vertical</label>
+                </div>
+            </div>
             <!-- Additional Controls -->
             <div class="col-span-2"><label for="patternRotation" class="form-label">Pattern Direction</label><select id="patternRotation" class="form-select"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
             <div class="col-span-2"><label for="startFrom" class="form-label">Start From</label><select id="startFrom" class="form-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
@@ -520,9 +530,11 @@
         }
     }
     
-    function button_clicked(flag) {
-        rubyCalled( 'calcul', flag);
-    }
+function button_clicked(flag) {
+    const layoutDirection = document.querySelector('input[name="layoutdir"]:checked')?.value || "horizontal";
+    rubyCalled('applybardage', layoutDirection);
+    rubyCalled('calcul', flag);
+}
     
     function messageFromSketchUp(msg) {
         // This function existed in the original file.

@@ -1,4 +1,5 @@
-module OobLayoutsModule # one module wrapper
+module OobLayoutsModule
+require 'fileutils'
 
 OOB_VERSIONFULL = "FUL6" # V6.0
 
@@ -230,6 +231,7 @@ module BR_OOB
 	# variables de classe
 	@@OOBpluginRep = 'Plugins/Oob-layouts/'
 	#@@OOBpluginRep = 'Plugins/Oob-DEV/' # MODIF A COMMENTER EN RELEASE
+	@@presets_dir = File.join(@@OOBpluginRep, 'presets')
 	
 	@@OOB_VERSION = "Oob%201402"
 	
@@ -263,7 +265,7 @@ module BR_OOB
 	@@f_heightoffset = 0.0
 	@@f_lengthoffset = 0.0
 	@@s_presetname = "" #	selectPreset
-	
+	@@force_horizontal_rows = 0 # NEW: Force horizontal rows
 	
 	@@f_jointLongueur = 0.005
 	@@f_jointLargeur = 0.005 #cm
@@ -841,8 +843,8 @@ module BR_OOB
 		@dialogOobOne.add_action_callback("deletepreset") do |js_wd, message|
 			rep = UI.messagebox(BR_OOB.getString("Delete preset")+" : " + message+ " ?",MB_YESNO)
 			if(rep == 6)  # Yes
-				presetfilename = Sketchup.find_support_file(message+'.oob', @@OOBpluginRep+'/presets')
-				if !File::exists?(presetfilename)
+				presetfilename = File.join(@@presets_dir, message + '.oob')
+				if !File.exist?(presetfilename)
 					UI.messagebox "Error, file not found!"
 				else	
 					puts "deleting preset"
@@ -853,7 +855,7 @@ module BR_OOB
 					# 4.6 Add preset file names to select
 					#==================================
 					# 6.1.5 presetsfiles = Sketchup.find_support_files('oob', @@OOBpluginRep+'/presets')
-					presetsfiles = Dir[Sketchup.find_support_file('Plugins')+'/Oob-layouts/presets/*.oob']
+					presetsfiles = Dir.glob(File.join(@@presets_dir, '*.oob'))
 					#puts "presetsfiles"
 					presetsfiles.each{|file|
 						#puts file
@@ -866,112 +868,75 @@ module BR_OOB
 		
 		# V4.6 sauvegarde des param courants en preset
 		#=================================================
-@dialogOobOne.add_action_callback("savepreset") do |js_wd, message|
-  prompts = [BR_OOB.getString("Nom du preset")] 
-  values = [""] 		
-  enums = [ nil]         
-  results = inputbox prompts, values, enums, "Give a name to preset"
-  return if not results # cancel
-
-  presetsfiles = Dir[Sketchup.find_support_file('Plugins') + '/Oob-layouts/presets/*.oob']
-  file = presetsfiles[0]
-  if trace == 1	
-    puts file
-    puts File.basename(file)
-    puts File.dirname(file)   
-  end
-  fullname = File.dirname(file) + "/" + results[0] + ".oob"
-  puts fullname if trace == 1			
-
-  radiovalue = @dialogOobOne.get_element_value("inputradiohidden").to_s
-
-  file = File.open(fullname, 'w')
-    file.write("Oob preset parameters;" + results[0].to_s + ";\n")
-    file.write("@@i_unit;" + Sketchup.active_model.options["UnitsOptions"]["LengthUnit"].to_s + ";\n") # V5
-    file.write("@@f_longueurBardage;" + @dialogOobOne.get_element_value("input2").to_s + ";\n")
-    file.write("@@f_hauteurBardage;" + @dialogOobOne.get_element_value("input3").to_s + ";\n")
-    file.write("@@f_randomlongueurBardage;" + @dialogOobOne.get_element_value("inputrand2").to_s + ";\n")
-    file.write("@@f_randomhauteurBardage;" + @dialogOobOne.get_element_value("inputrand3").to_s + ";\n")
-    file.write("@@f_layeroffset;" + @dialogOobOne.get_element_value("inputlayeroffset").to_s + ";\n") 
-    file.write("@@f_heightoffset;" + @dialogOobOne.get_element_value("inputheightoffset").to_s + ";\n") 
-    file.write("@@f_lengthoffset;" + @dialogOobOne.get_element_value("inputlengthoffset").to_s + ";\n") 
-    file.write("@@f_randomepaisseurBardage;" + @dialogOobOne.get_element_value("inputrand4").to_s + ";\n")
-    file.write("@@f_randomColor;" + @dialogOobOne.get_element_value("inputrand5").to_s + ";\n")
-    file.write("@@f_epaisseurBardage;" + @dialogOobOne.get_element_value("input4").to_s + ";\n")
-    file.write("@@f_jointLongueur;" + @dialogOobOne.get_element_value("input5").to_s + ";\n")
-    file.write("@@f_jointLargeur;" + @dialogOobOne.get_element_value("input6").to_s + ";\n")
-    file.write("@@f_jointProfondeur;" + @dialogOobOne.get_element_value("input7").to_s + ";\n")
-    file.write("@@f_decalageRangees;" + @dialogOobOne.get_element_value("input8").to_s + ";\n")
-    file.write("@@s_colorname;" + @dialogOobOne.get_element_value("input9").to_s + ";\n")
-    file.write("@@i_startpoint;" + @dialogOobOne.get_element_value("inputstartpoint").to_s + ";\n")
-  file.close
-
-  @dialogOobOne.execute_script('addPresetOption("' + results[0].to_s + '");')
-end
-
-@dialogOobOne.add_action_callback("selectpreset") do |js_wd, message|
-  presetfilename = Sketchup.find_support_file(message + '.oob', @@OOBpluginRep + '/presets')
-  unless File.exist?(presetfilename)
-    puts "Preset file not found: #{presetfilename}"
-    next
-  end
-
-  presetunit = 4
-  modelunit = Sketchup.active_model.options["UnitsOptions"]["LengthUnit"]
-  tabunitconversion = [1.0, 12.0, 0.1 / 2.54, 1.0 / 2.54, 100.0 / 2.54]
-  unitconversionmodel = 1.0 / tabunitconversion[modelunit]
-  unitconversionpreset = tabunitconversion[presetunit]
-
-  File.open(presetfilename).each_line do |line|
-    line = line.strip
-    puts "LINE: #{line}"
-    tab = line.split(';')
-    next if tab.empty?
-
-    case tab[0]
-    when "@@i_unit"
-      presetunit = tab[1].to_i
-      unitconversionpreset = tabunitconversion[presetunit]
-      puts "Preset unit: #{presetunit}, Conversion ratio: #{unitconversionpreset}"
-    when "@@f_longueurBardage"
-      val = (tab[1].to_f * unitconversionmodel * unitconversionpreset).round(6).to_s
-      puts "Setting input2 to #{val}"
-      @dialogOobOne.execute_script("setValue('input2;#{val}');")
-    when "@@f_hauteurBardage"
-      val = (tab[1].to_f * unitconversionmodel * unitconversionpreset).round(6).to_s
-      puts "Setting input3 to #{val}"
-      @dialogOobOne.execute_script("setValue('input3;#{val}');")
-    else
-      if tab[0].start_with?("@@f_") || tab[0].start_with?("@@s_") || tab[0].start_with?("@@i_")
-        key = tab[0].sub('@@', '')
-        value = tab[1].to_s.strip rescue ''
-        unless value.empty?
-          puts "Setting #{key} to #{value}"
-          @dialogOobOne.execute_script("setValue('#{key};#{value}');")
-        end
-      end
-    end
-  end
-
-  @dialogOobOne.execute_script("compute();")
-end
+		@dialogOobOne.add_action_callback("savepreset") do |js_wd, message|
+			prompts = [BR_OOB.getString("Nom du preset")] 
+			values = [""] 		
+			enums = [ nil]         
+			results = inputbox prompts, values, enums, "Give a name to preset"
+			return if not results # cancel
+			
+			# 6.1.5 presetsfiles = Sketchup.find_support_files('oob', @@OOBpluginRep+'/presets')
+			presetsfiles = Dir.glob(File.join(@@presets_dir, '*.oob'))
+			#puts "presetsfiles"
+			file = presetsfiles[0]
+			if(trace == 1)	
+				puts file
+				puts File.basename(file)
+				puts File.dirname(file)   
+			end
+			fullname = File.join(@@presets_dir, results[0] + '.oob')
+			puts fullname if(trace == 1)			
+			
+			# Ensure presets directory exists
+			unless File.exist?(@@presets_dir)
+				FileUtils.mkdir_p(@@presets_dir)
+			end
+			
+			# TODO  : recup radio states left, center, right
+			radiovalue = @dialogOobOne.get_element_value("inputradiohidden").to_s
+			#UI.messagebox("radiovalue #{radiovalue}")
+			
+			# sauvegarde du fichier
+			file = File.open(fullname,'w')
+				file.write("Oob preset parameters;"+results[0].to_s+";\n")
+				file.write("@@i_unit;"+Sketchup.active_model.options["UnitsOptions"]["LengthUnit"].to_s+";\n") # V5
+				file.write("@@f_longueurBardage;"+@dialogOobOne.get_element_value("input2").to_s+";\n")
+				file.write("@@f_hauteurBardage;"+@dialogOobOne.get_element_value("input3").to_s+";\n")
+				file.write("@@f_randomlongueurBardage;"+@dialogOobOne.get_element_value("inputrand2").to_s+";\n")
+				file.write("@@f_randomhauteurBardage;"+@dialogOobOne.get_element_value("inputrand3").to_s+";\n")
+				# 6.0.0
+				file.write("@@f_layeroffset;"+@dialogOobOne.get_element_value("inputlayeroffset").to_s+";\n") 
+				file.write("@@f_heightoffset;"+@dialogOobOne.get_element_value("inputheightoffset").to_s+";\n") 
+				file.write("@@f_lengthoffset;"+@dialogOobOne.get_element_value("inputlengthoffset").to_s+";\n") 
+				file.write("@@force_horizontal_rows;"+@dialogOobOne.get_element_value("input_force_horizontal").to_s+";\n") # NEW
+				 
+				file.write("@@f_randomepaisseurBardage;"+@dialogOobOne.get_element_value("inputrand4").to_s+";\n")
+				file.write("@@f_randomColor;"+@dialogOobOne.get_element_value("inputrand5").to_s+";\n")
+				file.write("@@f_epaisseurBardage;"+@dialogOobOne.get_element_value("input4").to_s+";\n")
+				file.write("@@f_jointLongueur;"+@dialogOobOne.get_element_value("input5").to_s+";\n")
+				file.write("@@f_jointLargeur;"+@dialogOobOne.get_element_value("input6").to_s+";\n")
+				file.write("@@f_jointProfondeur;"+@dialogOobOne.get_element_value("input7").to_s+";\n")
+				file.write("@@f_decalageRangees;"+@dialogOobOne.get_element_value("input8").to_s+";\n")
+				file.write("@@s_colorname;"+@dialogOobOne.get_element_value("input9").to_s+";\n")
+				file.write("@@i_startpoint;"+@dialogOobOne.get_element_value("inputstartpoint").to_s+";\n")
+			file.close
+			
+			# on rajoute le preset dans la liste
+			@dialogOobOne.execute_script( 'addPresetOption( "'+results[0].to_s+'" );' )
+			
+		end
 		
 		# selection d'un fichier de preset
 		#===========================================
 		@dialogOobOne.add_action_callback("selectpreset") do |js_wd, message|
 			puts "selectpreset #{message}"
 			
-# lecture du fichier 
-presetfilename = Sketchup.find_support_file(message + '.oob', @@OOBpluginRep + '/presets')
-if !File.exist?(presetfilename)
-	UI.messagebox "Error, file not found!"
-else
-	# Continue reading file if it exists
-	File.open(presetfilename).each_line do |line|
-		# your existing parsing logic here
-	end
-end
-
+			# lecture du fichier 
+			presetfilename = File.join(@@presets_dir, message + '.oob')
+			if !File.exist?(presetfilename)
+				UI.messagebox "Error, file not found!"
+				next
+			end
 			# gestion unites
 			presetunit = 4 # les presets sont par defaut en metre
 			modelunit = Sketchup.active_model.options["UnitsOptions"]["LengthUnit"]
@@ -1052,6 +1017,7 @@ end
 				@dialogOobOne.execute_script( 'setValue( "inputheightoffset;'+tab[1]+'" );' ) if(tab[0] =="@@f_heightoffset") 
 				@dialogOobOne.execute_script( 'setValue( "inputlengthoffset;'+tab[1]+'" );' ) if(tab[0] =="@@f_lengthoffset") 
 				@dialogOobOne.execute_script( 'setValue( "selectPreset;'+tab[1]+'" );' ) if(tab[0] =="@@s_presetname") 
+				@dialogOobOne.execute_script( 'setValue( "input_force_horizontal;'+tab[1]+'" );' ) if(tab[0] =="@@force_horizontal_rows") # NEW
 				
 				@dialogOobOne.execute_script( 'setValue( "input4;'+(tab[1].to_f*unitconversionmodel*unitconversionpreset).to_s+'" );' ) if(tab[0] =="@@f_epaisseurBardage")
 				@dialogOobOne.execute_script( 'setValue( "input5;'+(tab[1].to_f*unitconversionmodel*unitconversionpreset).to_s+'" );' ) if(tab[0] =="@@f_jointLongueur")
@@ -1205,6 +1171,7 @@ end
 				@@f_heightoffset = @dialogOobOne.get_element_value("inputheightoffset").to_f 
 				@@f_lengthoffset = @dialogOobOne.get_element_value("inputlengthoffset").to_f 
 				@@s_presetname = @dialogOobOne.get_element_value("selectPreset").to_s 
+				@@force_horizontal_rows = @dialogOobOne.get_element_value("input_force_horizontal").to_i # NEW
 				
 				#puts "@@s_presetname #{@@s_presetname}"
 					
@@ -1270,6 +1237,7 @@ end
 			@dialogOobOne.execute_script( 'setValue( "inputheightoffset;'+@@f_heightoffset.to_s+'" );' )
 			@dialogOobOne.execute_script( 'setValue( "inputlengthoffset;'+@@f_lengthoffset.to_s+'" );' )
 			@dialogOobOne.execute_script( 'setValue( "selectPreset;'+@@s_presetname.to_s+'" );' )
+			@dialogOobOne.execute_script( 'setValue( "input_force_horizontal;'+@@force_horizontal_rows.to_s+'" );' ) # NEW
 				
 			@dialogOobOne.execute_script( 'setLabel( "label3;'+BR_OOB.getString("Hauteur(cm)").to_s+'" );' )
 			@dialogOobOne.execute_script( 'setValue( "input3;'+@@f_hauteurBardage.to_s+'" );' )
@@ -1313,6 +1281,8 @@ end
 			end
 			
 			@dialogOobOne.execute_script( 'setValue( "inputstartpoint;'+@@i_startpoint.to_s+'" );' ) # NI 0011
+			@dialogOobOne.execute_script( 'setLabel( "label_force_horizontal;'+BR_OOB.getString("Forcer rangées horizontales").to_s+'" );' ) # NEW
+			@dialogOobOne.execute_script( 'setValue( "input_force_horizontal;'+@@force_horizontal_rows.to_s+'" );' ) # NEW
 			
 			
 			# 4.6 Add preset file names to select
@@ -1320,7 +1290,7 @@ end
 			#puts "Loading prests files"
 			#6.1.5 presetsfiles = Sketchup.find_support_files('oob', @@OOBpluginRep+'/presets')
 			#puts "presetsfiles"
-			presetsfiles = Dir[Sketchup.find_support_file('Plugins')+'/Oob-layouts/presets/*.oob']
+			presetsfiles = Dir.glob(File.join(@@presets_dir, '*.oob'))
 			#puts presetsfiles
 
 			presetsfiles.each{|file|
@@ -1580,6 +1550,7 @@ end
 		f_heightoffset = @@f_heightoffset*unitconversion 
 		f_lengthoffset = @@f_lengthoffset*unitconversion 
 		s_presetname = @@s_presetname #	selectPreset
+		force_horizontal = @@force_horizontal_rows # NEW
 		
 		
 		if(b_jointperdu == "true")
@@ -1700,25 +1671,38 @@ end
 			end	
 		end
 		
-# matrice  de transformation dans un system d'axe de la facep
-vectX = Geom::Vector3d.new(1, 0, 0) # Force layout along global X axis (horizontal)
-vectZ = normalpositionnee
-vectY = vectZ.cross vectX
-
-debug3D = 0
-if (debug3D == 1)
-    puts "vectXYZ"	
-    puts vectX	
-    puts vectY	
-    puts vectZ	
-    BR_GeomTools.addDebugLinePV(origin, vectX, 30.0, nil)	
-    BR_GeomTools.addDebugLinePV(origin, vectY, 20.0, nil)	
-    BR_GeomTools.addDebugLinePV(origin, vectZ, 10.0, nil)	
-end
-debug3D = 0
-
-matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
- #Geom::Transformation.axes meanPoint, vectX, vectY, vectZ
+		# NEW: Force horizontal rows if enabled
+		if force_horizontal == 1
+			global_horizontal = Geom::Vector3d.new(1, 0, 0)
+			dot_product = global_horizontal.dot(normalpositionnee)
+			proj = global_horizontal - dot_product * normalpositionnee
+			if proj.length > 0.001
+				vectlongest = proj.normalize
+			else
+				# Fallback to original vector if projection is too small
+				vectlongest = vectlongest
+			end
+		end
+		
+		# matrice  de transformation dans un system d'axe de la facep
+		vectX = vectlongest
+		vectZ = normalpositionnee
+		vectY = vectZ.cross vectX
+		
+		debug3D = 0
+		if (debug3D == 1)
+			puts "vectXYZ"	
+			puts vectX	
+			puts vectY	
+			puts vectZ	
+			#BR_GeomTools.addDebugLinePV(meanPoint, vectlongest, 300.0, nil)	
+			BR_GeomTools.addDebugLinePV(origin, vectX, 30.0, nil)	
+			BR_GeomTools.addDebugLinePV(origin, vectY, 20.0, nil)	
+			BR_GeomTools.addDebugLinePV(origin, vectZ, 10.0, nil)	
+		end
+		debug3D = 0
+			
+		matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint ) #Geom::Transformation.axes meanPoint, vectX, vectY, vectZ
 		matface.invert! # pour transformer les points dans le systeme d'axes de la facep
 	
 		ind = 0
@@ -1860,7 +1844,7 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 		#decalageorigineX = pscalX-f_jointLongueur
 		decalageorigineX = pscalX - f_jointLongueur - f_decalageRangees
 		
-		# V5.1 si midle point on decale d'une demi longueur pour centrer le centre du bardage sur le centre de l'arete
+		# V5.1 si midle point on decale d'une demi longueur pour centrer le bardage sur le centre de l'arete
 		if(i_startpoint == 2)
 			decalageorigineX -= 0.5*f_longueurBardage
 		end
@@ -1926,6 +1910,7 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 		#2 multi longueurs 
 		
 		heightIndexTab = 0
+		row_index = 0 # NEW: track row index
 		# 
 		# Loop on Y 
 		#==================
@@ -1941,7 +1926,12 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 			if(f_tabHauteurBardage.length == 0)
 				#longueurx = f_longueurBardage
 				# V4.5 : long +- rand*longuer
-				lengthY = f_hauteurBardage*(1.0 + randomvalueY*f_randomhauteurBardage)
+				# Feature 1: Skip random for first row
+				if row_index == 0
+					lengthY = f_hauteurBardage
+				else
+					lengthY = f_hauteurBardage*(1.0 + randomvalueY*f_randomhauteurBardage)
+				end
 			else
 				#2 mode multi hauteur
 				result = BR_OOB.GetNextValue(f_tabHauteurBardage, heightIndexTab,f_randomhauteurBardage)
@@ -2043,7 +2033,6 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 						# 2 bis : si la longueur restane est < f_longueurMini on pose une lame plus courte (f_longueurElem - f_longueurMini)
 						#================================================================================================
 						# Dans tous les cas on doit récupérer le point de départ, point de pose de la lame(point bas gauche)
-						# recup du point de départ, point de pose de la lame(xmini, ymini)
 						trace = 0
 						
 						puts "LENGTH II =  #{lenghtii}" if(trace == 1) 
@@ -2190,6 +2179,7 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 			posx = decalageorigineX + decalagex - 2.0*f_longueurBardage - f_jointLongueur + f_lengthoffset # init selon X
 			
 			puts("posx =",posx) if(trace == 1) 
+			row_index += 1 # NEW: increment row index
 		end	#while posy
 				
 		puts "55555555555555555555555555555555555555555555" if(trace == 2) 
@@ -2255,6 +2245,7 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 		oob1grp.set_attribute "Oob", "Oob midlx", midlpoint[0]
 		oob1grp.set_attribute "Oob", "Oob midly", midlpoint[1]
 		oob1grp.set_attribute "Oob", "Oob midlz", midlpoint[2]	
+		oob1grp.set_attribute "Oob", "Oob force_horizontal", @@force_horizontal_rows # NEW
 			
 		# V4.5 random
 		oob1grp.set_attribute "Oob", "Oob f_randomlongueurBardage",  @@f_randomlongueurBardage
@@ -2368,7 +2359,7 @@ matface = Geom::Transformation.new(vectX, vectY, vectZ, meanPoint)
 				puts "lenghtii #{lenghtii}" if(trace == 1) 
 			end
 			totallength += lenghtii
-		}
+		end
 		
 		# dernière chute dans le recuperateur
 		if(	longueurchutes > 0.0)
@@ -2687,504 +2678,3 @@ end
 	# return surface/ 1550.0 
 
 end # of funtion creerOssature	
-
-
-
-	#===========================================
-	def BR_OOB.projectPointsOnPlane()
-		planefound = 0
-		pointfound = 0
-		puts "in projectPointsOnPlane"
-		# recherche d'une face de projection
-		mod = Sketchup.active_model
-		ent = mod.entities
-		sel = mod.selection
-		plane = nil
-		
-		sel.each {|entity| 
-			puts entity
-			if(entity.is_a? Sketchup::Face)
-				selFace = entity
-				planefound = 1
-				normal = selFace.normal
-				plane = selFace.plane
-				puts normal
-				puts plane
-				break
-			
-			end
-		}
-		if (planefound == 0)
-			UI.messagebox("Veuillez sélectionner un plan de projection(face)!")
-		else
-			# recherche des points
-			sel.each {|entity| 
-			if(entity.is_a? Sketchup::ConstructionPoint)
-				pointfound = 1
-				puts pointfound
-				selPoint = entity
-				position = selPoint.position
-				pointonplane = position.project_to_plane plane
-				puts "position"
-				puts position
-				puts "plane"
-				puts plane
-				puts "pointonplane"
-				puts pointonplane
-				# on cache le poit original, on affiche le point projeté
-				constprojpoint = ent.add_cpoint pointonplane
-				entity.hidden = true;
-				#plane = [Geom::Point3d.new(0,0,0), Geom::Vector3d.new(0,0,1)]
-				#a = [10,10,10]
-				#pointonplane = a.project_to_plane plane
-				#position = constpoint.position 
-				#break
-			end
-		}
-		end
-	end
-	def BR_OOB.importASCIIFILE()
-		model = Sketchup.active_model
-		entities = model.active_entities
-		# ouverture du dialog de selection de fichier
-		ascfile = UI.openpanel "Open Image File", model.path, "*.asc"	
-		puts ascfile
-		
-		# Suppression du ficher de resultat
-		# TODO a cdeommenter pour la release
-		if !File::exists?( ascfile )
-			UI.messagebox "Error,  Le fichier n'a pas pu être ouvert!"
-		end
-			
-		# lecture des points
-		File.open(ascfile ).each_line do |line|
-			
-			#UI.messagebox line
-			# on reagrde si la ligne contient un mot cle intéressant
-			#puts line
-			tab = line.split(' ')
-			#puts tab[0]
-			#puts tab[1]
-			
-			point1 = Geom::Point3d.new(tab[0].to_f, tab[1].to_f, tab[2].to_f)
-			constpoint = entities.add_cpoint point1
-			#UI.messagebox tab[0]
-			
-			# if(tab[0] == "ARCH-getPVMesurePoints")
-			# @nbPointsMesure = (tab[2].sub(',','.').sub(/\s/,"")).to_i
-			# puts @nbPointsMesure if (@TRACE == 1) 
-		end
-	end
-
-	def BR_OOB.debugFunction(edge)
-		puts "Selection edge :"
-		puts "edge.faces"
-		
-		value = edge.get_attribute "Oob", "Class1"
-		value2 = edge.get_attribute "Oob", "Class2"
-		valueM = edge.get_attribute "Oob", "ClassM"
-		valueM
-		if value != nil  
-			puts "Pt1 : %i" %value+" Pt2 "+"%i" %value2	+" PtM "+"%i" %valueM	
-		else
-			puts "Pt1 == nil"
-		end
-	end # debug function
-	
-	#======================================
-	# recup des parametres d'un l'elt
-	#======================================
-	def	BR_OOB.getResults(elt)#
-	
-		# V2.0 on recupere  les resultats sur le groupe
-		nb = elt.get_attribute "Oob", "Oob Nbelems"
-		long = elt.get_attribute "Oob", "Oob Longueurelems"
-		# V6.0 
-		surf = elt.get_attribute "Oob", "Oob Surfaceelems"
-		
-		# V4.0 chutes
-		nbelemcomplets = elt.get_attribute "Oob", "Oob NbElemComplets"
-		nbelemchutes = elt.get_attribute "Oob", "Oob NbElemChutes" 
-		nbchutes = elt.get_attribute "Oob", "Oob NbChutes" 
-		preset = elt.get_attribute "Oob", "Oob s_presetname"
-		
-		longf = long.to_f
-		message = "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head>"
-		message += BR_OOB.getString("Longueur totale des éléments créés:")+" %.2f" % longf  +" m"
-		message += "<br>"+BR_OOB.getString("Surface totale  des éléments créés:")+" %.2f" % surf  +" m2" if(surf)
-		message += "<br>"+BR_OOB.getString("Nombre total d'elements crees:")+" "+nb.to_s
-		message += "<br> - "+BR_OOB.getString("Nombre d'éléments non coupes")+" : #{nbelemcomplets}"
-		message += "<br> - "+BR_OOB.getString("Nombre d'éléments coupés (chutes)")+" : #{nbchutes}"
-		message += "<br> - "+BR_OOB.getString("Nombre d'éléments complets dans les chutes")+" : #{nbelemchutes}"
-		message += "<br>===> "+BR_OOB.getString("Nombre total d'éléments complets")+" :  #{nbelemchutes+nbelemcomplets}"
-		
-	
-		
-		# V 6.0.0 on scanne les sous groupes pour chercher de'aultres layouts
-		sublayouts = 0
-		if (elt.class == Sketchup::Group)
-			if(elt.name == "Oob-grp")
-				elt.entities.each do |entg|
-					if(entg.class == Sketchup::Group) and (entg.name == "Oob-copy")
-						if(sublayouts == 0)
-							message = "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head>"
-							if(preset != "")
-								message += "<br>- "+"#{preset}: #{nbelemchutes+nbelemcomplets} elts, "+" %.2f" % longf  +" m" 
-							else
-								message += "<br>- "+"Layer #{sublayouts}: #{nbelemchutes+nbelemcomplets} elts, "+" %.2f" % longf  +" m" 
-							end	
-							message += " ,%.2f" % surf  +" m2" if(surf)
-						end
-						sublayouts += 1
-						# recherhce de Oob-grp
-						entg.entities.each do |subentg|	
-							if(subentg.class == Sketchup::Group) and (subentg.name == "Oob-grp")
-								subnbelemcomplets = subentg.get_attribute "Oob", "Oob NbElemComplets"
-								subnbelemchutes = subentg.get_attribute "Oob", "Oob NbElemChutes"
-								sublong = subentg.get_attribute "Oob", "Oob Longueurelems"
-								subsurf = subentg.get_attribute "Oob", "Oob Surfaceelems"
-								sublongf = sublong.to_f
-								subpreset = subentg.get_attribute "Oob", "Oob s_presetname"
-								if(subpreset != "")
-									message += "<br>- "+"#{subpreset}: #{subnbelemchutes+subnbelemcomplets} elts, "+" %.2f" % sublongf  +" m"
-								else
-									message += "<br>- "+"Layer #{sublayouts}: #{subnbelemchutes+subnbelemcomplets} elts, "+" %.2f" % sublongf  +" m" 
-								end	
-								message += " ,%2.f" % subsurf + " m2" if(subsurf)
-							end
-						end	
-					end
-				end
-			end
-		end	
-		html= 'Hello world!'
-		dialogResults = UI::WebDialog.new(BR_OOB.getString("Oob layouts : results"), true, "OobLayoutResults", 400, 300, 200, 100, true)
-		message += "<br></html>"
-		puts message
-		dialogResults.set_html(message)
-		dialogResults.show{}
-		#rep = UI.messagebox(message) #BR_OOB.getString("Pas FULL"))					
-	end
-	
-	#======================================
-	# recup des parametres d'un l'elt
-	#======================================
-	def	BR_OOB.getParameters(elt)# GetPeram 
-		#puts "Getparam" #BR_OOB::Activate_PV_Texture()
-		
-		dic = elt.attribute_dictionary "Oob"			
-		#puts "dictionary found"
-		dic.each { | key, value|
-			#traitement de l'attribut
-			#puts  key.to_s + ' = ' + value.to_s #if(trace == 1)
-		}
-		
-		@@f_longueurBardage =elt.get_attribute "Oob", "Oob f_longueurBardage"
-		@@f_hauteurBardage = elt.get_attribute "Oob", "Oob f_hauteurBardage"
-		@@f_epaisseurBardage = elt.get_attribute "Oob", "Oob f_epaisseurBardage"
-		@@f_jointLongueur = elt.get_attribute "Oob", "Oob f_jointLongueur"
-		@@f_jointLargeur = elt.get_attribute "Oob", "Oob f_jointLargeur"
-		@@f_jointProfondeur = elt.get_attribute "Oob", "Oob f_jointProfondeur"
-		@@f_decalageRangees = elt.get_attribute "Oob", "Oob f_decalageRangees"
-		@@b_jointperdu = elt.get_attribute "Oob", "Oob b_jointperdu"
-		@@s_colorname = elt.get_attribute "Oob", "Oob s_colorname"
-		
-		@@i_startpoint = elt.get_attribute "Oob", "Oob i_startpoint"
-		
-		
-		# recup du vecteur
-		@@vectx = elt.get_attribute "Oob", "Oob vectX"
-		@@vecty = elt.get_attribute "Oob", "Oob vectY"
-		@@vectz = elt.get_attribute "Oob", "Oob vectZ"
-		@@origx = elt.get_attribute "Oob", "Oob origx"
-		@@origy = elt.get_attribute "Oob", "Oob origy"
-		@@origz = elt.get_attribute "Oob", "Oob origz"
-		
-		# V4.5
-		@@f_randomlongueurBardage = elt.get_attribute "Oob", "Oob f_randomlongueurBardage"
-		@@f_randomhauteurBardage = elt.get_attribute "Oob", "Oob f_randomhauteurBardage" 
-		@@f_randomepaisseurBardage = elt.get_attribute "Oob", "Oob f_randomepaisseurBardage"
-		@@f_randomColor = elt.get_attribute "Oob", "Oob f_randomColor"
-		
-		
-		# V5.1
-		@@startpointx =  elt.get_attribute "Oob", "Oob startx"
-		@@startpointy =  elt.get_attribute "Oob", "Oob starty"
-		@@startpointz =  elt.get_attribute "Oob", "Oob startz"
-		
-		@@midlpointx = elt.get_attribute "Oob", "Oob midlx"
-		@@midlpointy = elt.get_attribute "Oob", "Oob midly"
-		@@midlpointz = elt.get_attribute "Oob", "Oob midlz"
-		
-		@@endpointx = elt.get_attribute "Oob", "Oob endx"
-		@@endpointy = elt.get_attribute "Oob", "Oob endy"
-		@@endpointz = elt.get_attribute "Oob", "Oob endz"
-		
-		# V6.0.0
-		@@s_presetname = elt.get_attribute "Oob", "Oob s_presetname" 
-		@@f_layeroffset = elt.get_attribute "Oob", "Oob f_layeroffset"
-		@@f_heightoffset = elt.get_attribute "Oob", "Oob f_heightoffset"
-		@@f_lengthoffset = elt.get_attribute "Oob", "Oob f_lengthoffset"
-		
-	end	
-end #OF BR_OOB MODULE
-
-
- class MyShadowInfoObserver < Sketchup::ShadowInfoObserver
-       def onShadowInfoChanged(shadow_info, type)
-			#UI.messagebox("onShadowInfoChanged: " + type.to_s)
-			puts ("onShadowInfoChanged: " + type.to_s)
-			#puts ("My city is: " + shadow_info["City"].to_s)
-			puts ("Day : " + shadow_info["DayOfYear"].to_s)
-			puts ("ShadowTime  : " + shadow_info["ShadowTime "].to_s)
-			shadow_info.each { |key, value|
-				puts(key.to_s + '=' + value.to_s)
-			}
-	   end
- end
-	 
-#=====================================================
-# GetCursorPosTool
-#=====================================================
-class GetCursorPosTool
-	def initialize
-		puts 'OobDebugTool init' 
-	end
-	def reset
-		puts 'reset' if (@TRACE == 1)
-        @ip = Sketchup::InputPoint.new
-    end
-	def activate
-		puts "OobDebugTool activate"
-        self.reset
-	end
-	def deactivate(view)
-		puts 'deactivate' if (@TRACE == 1)
-	end
-	def onMouseMove(flags, x, y, view)
-		puts "onMouseMove: flags = #{flags}"
-		puts "                 x = #{x}"
-		puts "                 y = #{y}"
-		puts "              view = #{view}"
-		# retour a l'outil selection
-		Sketchup.active_model.select_tool nil
-		BR_OOB.getResults(ss[0])# GetParam 
-	end   
-end
-	
-#======================================================
-# Outil "PIPETTE" affichage du gisment sous la souris
-#======================================================
-class OobDebugTool
-	def initialize
-		puts 'initialize' if (@TRACE == 1)
-	end
-	def reset
-		puts 'reset' if (@TRACE == 1)
-        @ip = Sketchup::InputPoint.new
-    end
-	def activate
-		puts 'activate' if (@TRACE == 1)
-        Sketchup.send_action("showRubyPanel:") if (@TRACE == 1)
-        self.reset
-	end
-	def deactivate(view)
-		puts 'deactivate' if (@TRACE == 1)
-	end
-	def onMouseMove(flags, x, y, view)
-		#puts 'onMouseMove'
-		# puts x
-		# puts y
-		# puts @ip
-		@ip.pick view, x, y
-		if(@ip.valid?)
-			f = @ip.edge
-			# puts @f
-			if f != nil 
-				value = f.get_attribute "Oob", "Class1"
-				value2 = f.get_attribute "Oob", "Class2"
-				if value != nil  
-					view.tooltip = "Pt1 : %i" %value+" Pt2 "+"%i" %value2					
-					
-					#point16 = Geom::Point3d.new 0,0,0
-					#status = view.draw_text point16, "This is a test"
-				end
-			end
-		end
-		view.invalidate
-	end
-	def onRButtonDown(flags, x, y, view)
-		puts 'onRButtonDown'
-		# puts x
-		# puts y
-		# puts @ip
-		@ip.pick view, x, y
-		if(@ip.valid?)
-			f = @ip.edge
-			# puts @f
-			if f != nil 
-				value = f.get_attribute "Oob", "Class1"
-				value2 = f.get_attribute "Oob", "Class2"
-				if value != nil  
-					view.tooltip = "Pt1 : %i" %value+" Pt2 "+"%i" %value2					
-					
-					#point16 = Geom::Point3d.new 0,0,0
-					#status = view.draw_text point16, "This is a test"
-				end
-			end
-		end
-		view.invalidate
-	end
-	def onLButtonDown(flags, x, y, view)
-		# ajout 10.04 : sur clic gauche on demande si on veut ajouter un texte, sinon on sort du gisement
-		@ip.pick view, x, y
-		if(@ip.valid?)
-			f = @ip.face
-			# puts @f
-			if f != nil 
-				value = f.get_attribute  "A", "G"
-				if value == nil  
-					Sketchup.active_model.select_tool nil
-				else
-					mess = "Voulez vous  créer un texte 3D ?"
-					resulttexte = UI.messagebox mess , MB_YESNO
-					if resulttexte == 6 # Yes
-						point = @ip.position
-						puts "point"  if (@TRACE == 1)
-						puts point  if (@TRACE == 1)
-						
-						coordvect = [0.0,0.0,100.0]
-						
-						value2 = f.get_attribute  "A", "G"
-						if(value2 == nil)
-							texttodisplay = "Gisement : %.0f  kWh/m2/an" % value
-						else
-							texttodisplay = "Gisement : %.0f" % value + " kWh/m2/an\n Ratio : "+ "%.2f" % (value / value2)					
-						end
-						
-						
-						text = Sketchup.active_model.entities.add_text texttodisplay, point
-						vect = Geom::Vector3d.new coordvect
-						text.vector = vect
-						text.line_weight=1
-						text.leader_type=1
-						text.display_leader=true
-						text.arrow_type=2
-					else
-						Sketchup.active_model.select_tool nil
-					end
-				end
-			end	
-		end
-	end
-end # class OobDebugTool
-
-#----------------menu------------------
-if( true ) #not file_loaded?(__FILE__) ) # A enlever pour la release sinon le scrambler deconne
-
-	# chargement des chaines NLS
-	BR_OOB.loadStrings()
-	#======================================================	
-	# ------------ Menu contextuel --------------------------------
-	#======================================================
-	UI.add_context_menu_handler do |menu|
-		ss = Sketchup.active_model.selection
-		if (ss.empty? == false)
-			#puts "Selection non vide"
-			#if ((ss[0].kind_of? Sketchup::Edge) and (ss.count==1))
-			#if (ss.count==1)
-				#BR_OOB.debugFunction(ss[0])
-			if(false) # test cablage
-				menu.add_separator	
-				nbc = ss[0].get_attribute "Oob", "nbCables"
-				#puts "nbc =#{nbc}"
-				
-				if nbc == nil  
-					menu.add_item("Oob cables"){
-						# ajout / recup d'un nombre de cables sur l'edge
-						BR_OOB.setNbCables(ss)
-					}
-				else
-					menu.add_item("Oob cables OK"){
-						# ajout / recup d'un nombre de cables sur l'edge
-						BR_OOB.setNbCables(ss)
-					}
-				end
-			end	
-			#end
-			if ((ss[0].kind_of? Sketchup::Group) and (ss.count==1))
-				#puts "it s a group"
-				dic = ss[0].attribute_dictionary "Oob"
-				
-				if dic != nil 
-					menu.add_separator 
-					
-					# Recuperer parametres
-					menu.add_item(BR_OOB.getString("Oob récupérer paramètres") ){ 
-						BR_OOB.getParameters(ss[0])# GetParam 
-					}
-					# Recuperer les résultats
-					menu.add_item(BR_OOB.getString("Oob voir résultats") ){ 
-						#Sketchup.active_model.select_tool GetCursorPosTool.new
-						BR_OOB.getResults(ss[0])# GetParam 
-					}
-					
-					# Editer
-					menu.add_item(BR_OOB.getString("Oob editer") ){ 
-						Sketchup.active_model.start_operation(BR_OOB.getString("Créer calepinage"),true) ###############################################
-						# recup des parametres
-						BR_OOB.getParameters(ss[0])
-						# undo 
-						face = BR_OOB.undoOob(ss[0])
-						
-						# selecton d'une face
-						Sketchup.active_model.selection.clear
-						Sketchup.active_model.selection.add face
-						
-						# edit
-						moderedo = 1
-						BR_OOB.creerOssature(moderedo)
-						Sketchup.active_model.commit_operation 
-					}
-					
-					# Annuler
-					menu.add_item(BR_OOB.getString("Oob annuler") ){ 
-						Sketchup.active_model.start_operation(BR_OOB.getString("Undo"),true) ###############################################
-						BR_OOB.undoOob(ss[0])
-						Sketchup.active_model.commit_operation 
-					}
-				end
-				#oob1grp.set_attribute "Oob", "Oob f_longueurBardage", @@f_longueurBardage
-			end	
-		end	
-	end
-		
-	#========================================================
-	# TOOLBAR 
-	# TOOLBAR UI.toolbar("Oob").show
-	#=========================================================
-	toolbar = UI::Toolbar.new "Oob"
-	
-	# Commande principale OOB : calcul de callepinage
-	#====================================================
-	#small_icon = Sketchup.find_support_file('delicious-s.png', 'Plugins/Oob-DEV/icons')
-	small_icon = Sketchup.find_support_file('delicious-s.png', 'Plugins/Oob-layouts/icons')
-	#large_icon = Sketchup.find_support_file('delicious-l.png', 'Plugins/Oob-DEV/icons') 
-	large_icon = Sketchup.find_support_file('delicious-l.png', 'Plugins/Oob-layouts/icons') 
-	cmd2 = UI::Command.new("CommandeOob") {
-		#BR_OOB.importASCIIFILE()
-		Sketchup.active_model.start_operation(BR_OOB.getString("Créer calepinage"),true) ###############################################
-		BR_OOB.creerOssature(0)
-		Sketchup.active_model.commit_operation   ###############################################
-	}
-
-	 cmd2.small_icon = small_icon
-	 cmd2.large_icon = large_icon
-	 cmd2.menu_text = BR_OOB.getString("Oob calepinage")
-	 cmd2.tooltip = BR_OOB.getString("Oob tooltip")
-	 toolbar = toolbar.add_item cmd2
-	
-	 toolbar.show 
-end
-
-end # global wrapper
