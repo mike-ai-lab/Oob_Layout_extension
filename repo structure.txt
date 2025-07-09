@@ -1,0 +1,110 @@
+repo structure
+
+C:\Users\mshke\AppData\Roaming\SketchUp\SketchUp 2025\SketchUp\Plugins\Oob-layouts\
+
+C:.
+│   Oob-layouts-loader.rb
+│   Oob.rb
+│   ReleaseNotes.txt
+│
+├───.qodo
+├───.vscode
+│       settings.json
+│
+├───dialogs
+│   │   OobONE.html
+│   │
+│   ├───css
+│   │       bootstrap.css
+│   │       bootstrap.min.css
+│   │       demo.css
+│   │       font-awesome.min.css
+│   │       smartadmin-production.css
+│   │       smartadmin-skins.css
+│   │
+│   ├───dist
+│   │   ├───css
+│   │   │       bootstrap-theme.css
+│   │   │       bootstrap-theme.min.css
+│   │   │       bootstrap.css
+│   │   │       bootstrap.min.css
+│   │   │
+│   │   ├───fonts
+│   │   │       glyphicons-halflings-regular.eot
+│   │   │       glyphicons-halflings-regular.svg
+│   │   │       glyphicons-halflings-regular.ttf
+│   │   │       glyphicons-halflings-regular.woff
+│   │   │
+│   │   └───js
+│   │           bootstrap.js
+│   │           bootstrap.min.js
+│   │
+│   ├───images
+│   │       account-login-8x.png
+│   │       browser-8x.png
+│   │       diskette.png
+│   │       list.png
+│   │       Oob1.png
+│   │       Oob2.png
+│   │       Oob3.png
+│   │
+│   └───js
+│           app.js
+│           bootstrap.js
+│           bootstrap.min.js
+│           css3-mediaqueries.js
+│           html5shiv.js
+│           jquery.min.js
+│           respond.min.js
+│
+├───files
+│       ChineseStrings.arp
+│       Copie de Strings.arp
+│       Parameters.oob
+│       Strings - Copie.csv
+│       Strings.arp
+│
+├───icons
+│       delicious-l.png
+│       delicious-s.png
+│
+└───presets
+        1- ADMIN STONE PATTERN.oob
+        1-top-preset.oob
+        15 STONE PATTERN.oob
+        2-admin-preset.oob
+        Barrier.oob
+        Breeze blocks.oob
+        Bricks.oob
+        Floor joists.oob
+        Floor osb.oob
+        Nuclear storm.oob
+        OSB 2.4 x 1.2.oob
+        Pavement aligned.oob
+        Pavement half offset.oob
+        Pavement random.oob
+        Plaster boards.oob
+        Plaster rails H.oob
+        Plaster rails V.oob
+        Plaster screws.oob
+        Portal.oob
+        Random stones wall.oob
+        Sidings cms.oob
+        Sidings.oob
+        stair pattern.oob
+        Stone Wall 35 cm thick.oob
+        Terrasse beams.oob
+        Terrasse regular.oob
+        Terrasse screws.oob
+        Terrasse supports.oob
+        Terrasse.oob
+        Tiling 18 cm.oob
+        Tiling 27 cm.oob
+        Vapor barrier.oob
+        Vertical PVC 20 cm.oob
+        Wall insulation.oob
+        Wall OSB.oob
+        Wall sidings.oob
+        Wall Structure.oob
+        Walll siding joists.oob
+        wood beams.oob

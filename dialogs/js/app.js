@@ -2788,7 +2788,8 @@ function getOobAdvancedControls() {
 		patternRotation: document.getElementById('patternRotation')?.value || 'horizontal',
 		startFrom: document.getElementById('startFrom')?.value || 'bottom',
 		forceFullRow: document.getElementById('forceFullRow')?.checked ? 1 : 0,
-		startRowHeight: document.getElementById('startRowHeight')?.value || 'auto'
+		startRowHeight: document.getElementById('startRowHeight')?.value || 'auto',
+		lastRowPlacement: document.getElementById('lastRowPlacement')?.value || 'cut'
 	};
 }
 
@@ -2808,3 +2809,4 @@ function setRowHeightOptions(heights) {
 		sel.innerHTML += `<option value="${h}">${h}</option>`;
 	});
 }
+

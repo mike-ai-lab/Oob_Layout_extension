@@ -1,632 +1,537 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Oob Plugin</title>
-    <!-- Tailwind CSS for modern styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        :root {
-            --color-bg-dark: #191818;
-            --color-bg-alt-dark: rgb(30, 30, 30);
-            --color-surface-dark: rgba(255, 255, 255, 0.05);
-            --color-surface-hover-dark: rgba(255, 255, 255, 0.08);
-            --color-surface-active-dark: rgba(255, 255, 255, 0.12);
-            --color-text-dark: #E1E1E1;
-            --color-text-secondary-dark: #A8A8A8;
-            --color-text-tertiary-dark: #7F7F7F;
-            --color-accent-dark: #82aaff;
-            --color-accent-alt-dark: #c792ea;
-            --color-cursor-dark: #82aaff;
-            --color-border-dark: rgba(255, 255, 255, 0.12);
-            --color-success-dark: #32d74b;
-            --glass-bg-dark: rgba(30, 30, 30, 0.6);
-            --glass-border-dark: rgba(255, 255, 255, 0.15);
-            --glass-highlight-dark: rgba(255, 255, 255, 0.1);
-            --glass-shadow-dark: rgba(0, 0, 0, 0.3);
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-        body {
-            background: #1b1b1b;
-            color: #fff;
-            font-family: var(--font-primary);
-            padding: 1.2rem;
-            font-size: 15px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .max-w-md {
-            background: rgb(41, 41, 41);
-            border-radius: 1.2rem;
-            box-shadow: var(--glass-shadow-dark);
-            border: 1.5px solid var(--glass-border-dark);
-            padding: 2rem 2.2rem 1.5rem 2.2rem;
-        }
-        .form-label {
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 0.25rem;
-            display: block;
-            font-size: 15px;
-            letter-spacing: 0.01em;
-        }
-        .form-label span {
-            font-weight: 400;
-            color: var(--color-text-tertiary-dark);
-            font-size: 12px;
-        }
-        .form-input {
-            background: #23272f;
-            border: 1.5px solid #353945;
-            color: #f3f3f3;
-            border-radius: 0.6rem;
-            padding: 0.32rem 0.7rem;
-            width: 70px;
-            font-size: 15px;
-            transition: border-color 0.2s, background 0.2s;
-            min-width: 0;
-            max-width: 90px;
-            box-shadow: none;
-        }
-        .form-select {
-            background: #23272f;
-            border: 1.5px solid #353945;
-            color: #f3f3f3;
-            border-radius: 0.6rem;
-            padding: 0.32rem 0.7rem;
-            width: 220px;
-            font-size: 15px;
-            transition: border-color 0.2s, background 0.2s;
-            min-width: 0;
-            max-width: 350px;
-            box-shadow: none;
-        }
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #82aaff;
-            background: #23272f;
-            color: #fff;
-            box-shadow: 0 0 0 2px #2d3748;
-        }
-        .form-select option {
-            background: #23272f;
-            color: #f3f3f3;
-        }
-        .number-input-wrapper {
-            display: flex;
-            align-items: center;
-        }
-        .number-input-wrapper input {
-            text-align: center;
-            border-left: none;
-            border-right: none;
-            border-radius: 0;
-            z-index: 1;
-            padding-left: 0.1rem;
-            padding-right: 0.1rem;
-        }
-        .stepper-btn {
-            background: #23272f;
-            color: #b0b6c3;
-            border: none;
-            width: 28px;
-            height: 28px;
-            min-width: 28px;
-            min-height: 28px;
-            max-width: 28px;
-            max-height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin: 0 2px;
-            transition: background 0.18s, color 0.18s;
-        }
-        .stepper-btn:hover {
-            background: #353945;
-            color: #82aaff;
-        }
-        .stepper-btn:active {
-            background: #1E1E1E;
-        }
-        .btn {
-            padding: 0.38rem 0.38rem;
-            border-radius: 50%;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.18s, color 0.18s, border 0.18s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            border: none;
-            box-shadow: none;
-            background: #23272f;
-            color: #b0b6c3;
-        }
-        .btn-primary {
-            background: #23272f;
-            color: #82aaff;
-            border: 1.5px solid #353945;
-        }
-        .btn-primary:hover {
-            background: #353945;
-            color: #fff;
-            border-color: #82aaff;
-        }
-        .btn-secondary {
-            background: #23272f;
-            color: #b0b6c3;
-            border: 1.5px solid #353945;
-        }
-        .btn-secondary:hover {
-            background: #353945;
-            color: #82aaff;
-        }
-        .btn-icon {
-            padding: 0.38rem;
-        }
-        .radio-group input[type="radio"] { display: none; }
-        .radio-group label {
-            background: var(--color-surface-dark);
-            padding: 0.4rem 0.8rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: 1.5px solid var(--color-border-dark);
-        }
-        .radio-group label:first-of-type { border-radius: 0.5rem 0 0 0.5rem; }
-        .radio-group label:last-of-type { border-radius: 0 0.5rem 0.5rem 0; }
-        .radio-group input[type="radio"]:checked + label {
-            background: var(--color-accent-dark);
-            color: rgb(38, 38, 38);
-            border-color: var(--color-accent-dark);
-            z-index: 10;
-        }
-        fieldset {
-            border: 1.5px solid var(--color-border-dark);
-            border-radius: 0.7rem;
-            padding: 1rem 1.2rem 1.2rem;
-            margin-bottom: 1.1rem;
-            background: var(--glass-bg-dark);
-        }
-        legend {
-            padding: 0 0.7rem;
-            font-weight: 600;
-            color: var(--color-text-dark);
-            font-size: 1.1em;
-        }
-        .col-span-2, .col-span-4 {
-            margin-bottom: 0.5rem;
-        }
-        .number-input-wrapper input[type="text"]::-webkit-inner-spin-button, .number-input-wrapper input[type="text"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .number-input-wrapper input[type="text"] {
-            appearance: textfield;
-        }
-    </style>
-</head>
-<body>
+<!-- sample.html - beginning HTML for the ruby2javascript piece --><html><head>
+		<title>Oob plugin</title>
+		<!--<meta http-equiv="Content-Type" content="text/html; charset=gb2312">-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="MSThemeCompatible" content="Yes">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		-->
+		
+		 
+		<!-- Jquery, in case of offline use-->
+		<script src="./js/jquery.min.js"></script>
+		<!-- Bootstrap core CSS -->
+		<link href="./dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--  [if lt IE 9]>-->
+		<script src="./js/html5shiv.js"></script>
+		<script src="./js/respond.min.js"></script>
+		<!--<![endif]-->
+	<link href="data:text/css;charset=utf-8," data-href="../dist/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet"><link href="../assets/css/docs.min.css" rel="stylesheet"><script src="../assets/js/ie8-responsive-file-warning.js"></script><script src="../assets/js/ie-emulation-modes-warning.js"></script></head>
 
-<div class="max-w-md mx-auto">
+<!-- Optional Bootstrap Theme -->
 
-    <!-- =========== PRESETS SECTION =========== -->
-    <fieldset>
-        <legend>Presets</legend>
-        <div class="flex items-center space-x-2">
-            <div class="flex-grow">
-                <select id="selectPreset" class="form-select">
-                    <option>Select a preset</option>
-                </select>
-            </div>
-            <button title="Create a new preset" onclick="saveCurrentPreset()" class="btn btn-secondary btn-icon">
-                <i class="fa-solid fa-plus fa-fw"></i>
-            </button>
-            <button title="Delete current preset" onclick="deleteCurrentPreset()" class="btn btn-secondary btn-icon">
-                <i class="fa-solid fa-trash-can fa-fw"></i>
-            </button>
-        </div>
-    </fieldset>
 
-    <!-- =========== PARAMETERS SECTION =========== -->
-    <fieldset>
-        <legend>Parameters</legend>
-        <div class="grid grid-cols-2 gap-x-6 gap-y-3">
-            <div>
-                <label class="form-label">Stone Length (mm)<br><span>Width of each stone piece</span></label>
-                <div class="number-input-wrapper" title="Stone Length">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input2', -1)">-</button>
-                    <input type="text" id="input2" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input2', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Randomize Length<br><span>Random variation (0-1)</span></label>
-                <div class="number-input-wrapper" title="Randomize Length">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputrand2', -0.01)">-</button>
-                    <input type="text" id="inputrand2" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputrand2', 0.01)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Stone Height (mm)<br><span>Height of each stone piece</span></label>
-                <div class="number-input-wrapper" title="Stone Height">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input3', -1)">-</button>
-                    <input type="text" id="input3" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input3', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Randomize Height<br><span>Random variation (0-1)</span></label>
-                <div class="number-input-wrapper" title="Randomize Height">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputrand3', -0.01)">-</button>
-                    <input type="text" id="inputrand3" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputrand3', 0.01)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Stone Thickness (mm)<br><span>Depth of each stone piece</span></label>
-                <div class="number-input-wrapper" title="Stone Thickness">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input4', -1)">-</button>
-                    <input type="text" id="input4" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input4', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Randomize Thickness<br><span>Random variation (0-1)</span></label>
-                <div class="number-input-wrapper" title="Randomize Thickness">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputrand4', -0.01)">-</button>
-                    <input type="text" id="inputrand4" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputrand4', 0.01)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Length (mm)<br><span>Horizontal gap between stones</span></label>
-                <div class="number-input-wrapper" title="Joint Length">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input5', -1)">-</button>
-                    <input type="text" id="input5" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input5', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Length Offset (mm)<br><span>Random offset for joint length</span></label>
-                <div class="number-input-wrapper" title="Joint Length Offset">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputlengthoffset', -1)">-</button>
-                    <input type="text" id="inputlengthoffset" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputlengthoffset', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Height (mm)<br><span>Vertical gap between stones</span></label>
-                <div class="number-input-wrapper" title="Joint Height">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input6', -1)">-</button>
-                    <input type="text" id="input6" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input6', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Height Offset (mm)<br><span>Random offset for joint height</span></label>
-                <div class="number-input-wrapper" title="Joint Height Offset">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputheightoffset', -1)">-</button>
-                    <input type="text" id="inputheightoffset" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputheightoffset', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Depth (mm)<br><span>Depth of the joint (for 3D)</span></label>
-                <div class="number-input-wrapper" title="Joint Depth">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input7', -1)">-</button>
-                    <input type="text" id="input7" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input7', 1)">+</button>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Joint Depth Offset (mm)<br><span>Random offset for joint depth</span></label>
-                <div class="number-input-wrapper" title="Joint Depth Offset">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputlayeroffset', -1)">-</button>
-                    <input type="text" id="inputlayeroffset" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputlayeroffset', 1)">+</button>
-                </div>
-            </div>
-            
-            <!-- Row Offset -->
-            <div class="col-span-2">
-                <label for="input8" class="form-label">Row Offset</label>
-                <div class="number-input-wrapper">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('input8', -0.1)"><i class="fa-solid fa-minus"></i></button>
-                    <input type="text" id="input8" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('input8', 0.1)"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
+<!-- Documentation extras -->
 
-            <!-- Alignment -->
-            <div class="col-span-2">
-                <label class="form-label">Alignment</label>
-                <div class="flex radio-group">
-                    <input type="radio" name="options" id="option1" onchange="setRadioValue(1);">
-                    <label id="labeloption1" for="option1" title="Start from left"><i class="fa-solid fa-align-left"></i></label>
-                    <input type="radio" name="options" id="option2" onchange="setRadioValue(2);">
-                    <label id="labeloption2" for="option2" title="Start from center"><i class="fa-solid fa-align-center"></i></label>
-                    <input type="radio" name="options" id="option3" onchange="setRadioValue(3);">
-                    <label id="labeloption3" for="option3" title="Start from right"><i class="fa-solid fa-align-right"></i></label>
-                </div>
-            </div>
-            
-            <!-- Layout Direction -->
-            <div class="col-span-2">
-                <label class="form-label">Layout Direction</label>
-                <div class="flex radio-group">
-                    <input type="radio" name="layoutdir" id="layoutHorizontal" value="horizontal" checked>
-                    <label for="layoutHorizontal" title="Lay stones horizontally">Horizontal</label>
-                    <input type="radio" name="layoutdir" id="layoutVertical" value="vertical">
-                    <label for="layoutVertical" title="Lay stones vertically">Vertical</label>
-                </div>
-            </div>
-            <!-- Additional Controls -->
-            <div class="col-span-2"><label for="patternRotation" class="form-label">Pattern Direction</label><select id="patternRotation" class="form-select"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
-            <div class="col-span-2"><label for="startFrom" class="form-label">Start From</label><select id="startFrom" class="form-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
-            <div class="col-span-2"><label for="startRowHeight" class="form-label">Starting Row Height</label><select id="startRowHeight" class="form-select"><option value="auto">Auto</option></select></div>
-            <div class="col-span-2"><label for="lastRowPlacement" class="form-label">Last Row Placement</label><select id="lastRowPlacement" class="form-select"><option value="cut">Cut to Face</option><option value="full">Full Piece</option></select></div>
-            
-            <div class="col-span-4 flex items-center mt-1">
-                <input type="checkbox" id="forceFullRow" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
-                <label for="forceFullRow" class="ml-2 text-sm font-medium text-gray-300">Force Full Row as First Row</label>
-            </div>
-        </div>
-    </fieldset>
 
-    <!-- =========== COLOR SECTION =========== -->
-    <fieldset>
-        <legend>Color</legend>
-        <div class="grid grid-cols-4 gap-3">
-             <div class="col-span-2">
-                <label for="input9" class="form-label">Color Name / List</label>
-                <input type="text" id="input9" class="form-input" placeholder="Blue or Red;Green" onkeydown="return submitenter(this,event);">
-            </div>
-            <div class="col-span-2">
-                <label for="inputrand5" class="form-label">Count / Random</label>
-                <div class="number-input-wrapper" title="Number of colors (>2) + Random factor (0.0 > 1.0)">
-                    <button class="stepper-btn minus" onclick="updateNumberInput('inputrand5', -0.1)"><i class="fa-solid fa-minus"></i></button>
-                    <input type="text" id="inputrand5" class="form-input" placeholder="0.0" onkeydown="return submitenter(this,event);">
-                    <button class="stepper-btn plus" onclick="updateNumberInput('inputrand5', 0.1)"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
-        </div>
-    </fieldset>
 
-    <!-- Hidden input must be preserved -->
-    <input type="text" id="inputstartpoint" value="1" style="display:none;">
 
-    <!-- =========== ACTION BUTTONS =========== -->
-    <div class="flex justify-end space-x-2 mt-2">
-        <button type="button" onclick="button_clicked(1)" class="btn btn-secondary"><i class="fa-solid fa-cogs mr-2"></i><span id="label10">Appliquer</span></button>
-        <button type="button" onclick="button_clicked(2)" class="btn btn-primary"><i class="fa-solid fa-check mr-2"></i><span id="label11">OK</span></button>
-        <button type="button" onclick="button_clicked(3)" class="btn btn-secondary"><i class="fa-solid fa-xmark mr-2"></i><span id="label12">Annuler</span></button>
-    </div>
+	
+<body leftmargin="5" topmargin="5" marginwidth="5" marginheight="5">
+<font size="2" face="Arial, Helvetica, sans-serif"> 
+
+
+<div class="container">
+<div class="row">
+
+&nbsp;
+<br>
+	<!--<div class="col-xs-3 ">
+		 <label class="pull-right" for="sel1">Select a preset</label>
+	</div>-->
+	<div class="col-xs-8">
+	<form role="form">
+		<!--<div class="form-group" id="parentOfPresetSelect">-->
+		<div id="parentOfPresetSelect">
+			<!-- PRESETS -->
+			<select class="form-control" id="selectPreset" onchange="selectPreset(this.value)">
+				<!--<select id="selectPreset">-->
+				<option>Select a preset</option>
+			</select>     
+		
+		</div>
+	  </form>
+	</div>
+	<div class="col-xs-2">
+		<!-- NEW PRESET -->
+		<button title="Create a new preset" type="button" onclick="saveCurrentPreset(3)" class="btn btn-info">
+			<span class="glyphicon glyphicon-plus"></span>
+		</button>
+	</div>
+	<div class="col-xs-2">
+		<!-- DELETE PRESET -->
+		<button title="Delete curent preset" type="button" onclick="deleteCurrentPreset(3)" class="btn btn-default">
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>
+	</div>
+</div> <!-- row -->
+</div> <!-- container -->
+
+<div class="container">
+<div class="row">
+	<div class="col-xs-3">
+		<img src="./images/Oob1.png" width="120" height="116">
+	</div>
+	<div class="col-xs-9">
+		<!-- LENGTH -->
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px">
+				<span class="glyphicon glyphicon-resize-horizontal"></span> 
+				<span id="label2"> Length </span>
+			</button>
+			<div class="btn-group" title="Single value or value1;value2;value3;...">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input2" onkeydown="return submitenter(this,event);">	
+			</div>
+			<div class="btn-group">
+			
+			&nbsp;&nbsp;
+			</div>
+			<button class="btn btn-default" type="button" onclick="" title="Random factor (0.0 > 1.0)">
+				<span class="glyphicon glyphicon-stats"></span>&nbsp;
+			</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputrand2" onkeydown="return submitenter(this,event);" title="Random factor (0.0 > 1.0)">
+			</div>
+		</div>
+		<br><br>
+		<!-- HEIGHT -->
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px"><span class="glyphicon glyphicon-resize-vertical"></span> <span id="label3"> Height </span></button>
+			<div class="btn-group" title="Single value or value1;value2;value3;...">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input3" onkeydown="return submitenter(this,event);">	
+			</div>
+			<div class="btn-group">
+			
+			&nbsp;&nbsp;
+			</div>
+			<button class="btn btn-default" type="button" onclick="" title="Random factor (0.0 > 1.0)">
+				<span class="glyphicon glyphicon-stats"></span>&nbsp;</button>
+			<div class="btn-group" title="Random factor (0.0 > 1.0)">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputrand3" onkeydown="return submitenter(this,event);">
+			</div>
+		</div>
+		<br><br>
+		<!-- THICKNESS -->
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px"><span class="glyphicon glyphicon-resize-full"></span> <span id="label4"> Thickness </span></button>
+			<div class="btn-group">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input4" onkeydown="return submitenter(this,event);">	
+			</div>
+			<div class="btn-group">
+			
+			&nbsp;&nbsp;
+			</div>
+			<button class="btn btn-default" type="button" onclick="" title="Random factor (0.0 > 1.0)"><span class="glyphicon glyphicon-stats"></span>&nbsp;</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputrand4" onkeydown="return submitenter(this,event);" title="Random factor (0.0 > 1.0)">
+			</div>
+		</div>
+	</div>
+
+</div><!-- row -->
+<br>
+<div class="row">
+	<div class="col-xs-3">
+		<img src="./images/Oob2.png" width="120" height="116">
+	</div>
+	<div class="col-xs-9">
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px">
+				<span class="glyphicon glyphicon-fullscreen"></span> 
+				<span id="label5"> Space length </span> 
+			</button>
+			<div class="btn-group">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input5" onkeydown="return submitenter(this,event);">	
+			</div>	
+			<div class="btn-group">
+				&nbsp;&nbsp;
+			</div>
+			<!-- 5.1.6 Length offset -->
+			<button class="btn btn-default" type="button" onclick="" title="Length offset"><span class=" glyphicon glyphicon-resize-full"></span>&nbsp;</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputlengthoffset" onkeydown="return submitenter(this,event);" title="Length offset">
+			</div>
+		</div>
+		<br><br>
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px"><span class="glyphicon glyphicon-fullscreen"></span> <span id="label6">  Space height </span></button>
+			<div class="btn-group">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input6" onkeydown="return submitenter(this,event);">	
+			</div>	
+			<div class="btn-group">
+				&nbsp;&nbsp;
+			</div>
+			<!-- 5.1.6 Height offset -->
+			<button class="btn btn-default" type="button" onclick="" title="Height offset"><span class=" glyphicon glyphicon-resize-full"></span>&nbsp;</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputheightoffset" onkeydown="return submitenter(this,event);" title="Height offset">
+			</div>
+		</div>
+		<br><br>
+		<!-- Joint Depth -->
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px">
+				<span class="glyphicon glyphicon-sort"></span>
+				<span id="label7">  Thickness</span> </button>
+			<div class="btn-group">
+				<input type="text" size="4" class="form-control" placeholder="0.0" id="input7" onkeydown="return submitenter(this,event);">	
+			</div>	
+			<div class="btn-group">
+				&nbsp;&nbsp;
+			</div>
+			<!-- 5.1.6 Depth offset -->
+			<button class="btn btn-default" type="button" onclick="" title="Depth offset"><span class=" glyphicon glyphicon-resize-full"></span>&nbsp;</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputlayeroffset" onkeydown="return submitenter(this,event);" title="Depth offset">
+			</div>
+		</div>
+		<br><br>
+		<!-- Row offset -->
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:100px">
+				<span class="glyphicon glyphicon-transfer"></span>
+				<span id="label8">Offset </span>
+			</button>
+			<div class="btn-group">
+				<input type="text" size="3" class="form-control" placeholder="0.0" id="input8" onkeydown="return submitenter(this,event);">	
+			</div>	
+			<div class="btn-group">
+				&nbsp;&nbsp;
+			</div>
+			
+			<!--<button class="btn btn-default" type="button" onclick=""><span class="glyphicon glyphicon-align-left"></span></button>
+			<button class="btn btn-default" type="button" onclick=""><span class="glyphicon glyphicon-align-center"></span></button>
+			<button class="btn btn-default" type="button" onclick=""><span class="glyphicon glyphicon-align-right"></span></button>
+			-->
+			<div class="btn-group" data-toggle="buttons">
+				  <label id="labeloption1" class="btn btn-default active" title="Start from left" onclick="setRadioValue(1);">
+					<input type="radio" name="options" id="option1" checked=""><span class="glyphicon glyphicon-align-left"></span>&nbsp;
+				  </label>
+				  <label id="labeloption2" class="btn btn-default" title="Start from center" onclick="setRadioValue(2);">
+					<input type="radio" name="options" id="option2"><span class="glyphicon glyphicon-align-center"></span>&nbsp;
+				  </label>
+				  <label id="labeloption3" class="btn btn-default" title="Start from right" onclick="setRadioValue(3);">
+					<input type="radio" name="options" id="option3"><span class="glyphicon glyphicon-align-right"></span>&nbsp;
+				  </label>
+			</div>
+
+<!-- Pattern Rotation Control -->
+<div class="btn-group" style="margin-top:10px;">
+  <label for="patternRotation">Pattern Direction:</label>
+  <select class="form-control" id="patternRotation" style="width:auto; display:inline-block; margin-left:10px;">
+	<option value="horizontal">Horizontal</option>
+	<option value="vertical">Vertical</option>
+  </select>
 </div>
 
-<!-- ALL JAVASCRIPT FROM ORIGINAL FILE + NEW STEPPER LOGIC -->
-<!-- It is critical that the original functions are not modified to ensure backend communication works. -->
-<script type='text/javascript'>
-    // ========================================================================
-    // NEW UI HELPER FUNCTIONS
-    // ========================================================================
-    
-    /**
-     * Updates the value of a number input field when a stepper button is clicked.
-     * @param {string} inputId - The ID of the input field to update.
-     * @param {number} delta - The amount to increase or decrease the value by.
-     */
-    function updateNumberInput(inputId, delta) {
-        const input = document.getElementById(inputId);
-        if (!input) return;
-        let currentValue = parseFloat(input.value);
-        if (isNaN(currentValue)) {
-            currentValue = 0;
-        }
-        let newValue = currentValue + delta;
-        // Always show up to 2 decimals for mm, 4 for randoms
-        let precision = 2;
-        if (inputId.startsWith('inputrand')) precision = 4;
-        newValue = parseFloat(newValue.toFixed(precision));
-        input.value = newValue;
-        rubyCalled('calcul', 'true');
-    }
+<!-- Start From Top/Bottom Control -->
+<div class="btn-group" style="margin-top:10px;">
+  <label for="startFrom">Start From:</label>
+  <select class="form-control" id="startFrom" style="width:auto; display:inline-block; margin-left:10px;">
+	<option value="bottom">Bottom</option>
+	<option value="top">Top</option>
+  </select>
+</div>
 
-    // Allow up/down arrow keys to increment/decrement for all number fields
-    document.addEventListener('DOMContentLoaded', function() {
-        const allInputs = document.querySelectorAll('.form-input');
-        allInputs.forEach(function(input) {
-            input.addEventListener('keydown', function(e) {
-                let id = input.id;
-                if (e.key === 'ArrowUp') {
-                    if (id.startsWith('inputrand')) updateNumberInput(id, 0.01);
-                    else updateNumberInput(id, 1);
-                    e.preventDefault();
-                } else if (e.key === 'ArrowDown') {
-                    if (id.startsWith('inputrand')) updateNumberInput(id, -0.01);
-                    else updateNumberInput(id, -1);
-                    e.preventDefault();
-                }
-            });
-        });
-    });
+<!-- Force Full Row as First Row -->
+<div class="checkbox" style="margin-top:10px;">
+  <label><input type="checkbox" id="forceFullRow" value="false" onchange="this.value = this.checked;"> Force Full Row as First Row</label>
+</div>
 
-    // ========================================================================
-    // ORIGINAL JAVASCRIPT FROM PROVIDED FILE - DO NOT MODIFY
-    // ========================================================================
+<!-- Starting Row Height Control (populated dynamically) -->
+<div class="btn-group" style="margin-top:10px;">
+  <label for="startRowHeight">Starting Row Height:</label>
+  <select class="form-control" id="startRowHeight" style="width:auto; display:inline-block; margin-left:10px;">
+	<option value="auto">Auto</option>
+	<!-- Heights will be populated by JS -->
+  </select>
+</div>
+<!-- Last Row Placement Control -->
+<div class="btn-group" style="margin-top:10px;">
+  <label for="lastRowPlacement">Last Row Placement:</label>
+  <select class="form-control" id="lastRowPlacement" style="width:auto; display:inline-block; margin-left:10px;">
+	<option value="cut">Cut to Face Bounds</option>
+	<option value="full">Full Piece (may extend past face bounds)</option>
+  </select>
+</div>
+		</div>
+			<input type="text" id="inputstartpoint" value="1" style="display:none;"><!-- style="display:none;">-->
+		<br><br>
+	</div> 
+<br>
+<!-- COLOR -->
+<div class="row">
+	<div class="col-xs-3">
+		<img src="./images/Oob3.png" width="120" height="30">
+	</div>
+	<!--<div class="col-xs-4">
+		<div class="input-group input-group-sm">
+			<span class="input-group-addon" id="label9">Color name</span>
+			<input type="text" class="form-control" placeholder="Blue" id="input9" onKeyDown="return submitenter(this,event);">		
+		</div>
+		
+	</div>-->
+	<div class="col-xs-9">
+		<div class="btn-group">
+			<button class="btn btn-info" type="button" onclick="" style="width:120px">
+				<span class="glyphicon glyphicon-tint"></span>  
+				<span id="label9"> Color <span>
+			</span></span></button>
+			<div class="btn-group">
+				<input type="text" size="9" class="form-control" placeholder="0.0" id="input9" onkeydown="return submitenter(this,event);">	
+			</div>	
+			<div class="btn-group">
+			&nbsp;&nbsp;
+			</div>
+			<button class="btn btn-default" type="button" onclick="" title="Number of colors ( > 2.0) + Random factor (0.0 > 1.0)"><span class="glyphicon glyphicon-stats"></span>&nbsp;</button>
+			<div class="btn-group">
+				<input type="text" size="1" class="form-control" placeholder="0.0" id="inputrand5" onkeydown="return submitenter(this,event);" title="Number of colors ( > 2.0) + Random factor (0.0 > 1.0)">
+			</div>
+		</div>
+	</div>
 
-    function clearPresetOption(){
-        var selectitem = document.getElementById("selectPreset");
-        if (selectitem) {
-            // Clear all but the first "Select" option
-            while (selectitem.options.length > 1) {
-                selectitem.remove(1);
-            }
-        }
-    }
+</div> 
+<div class="row ">
+	<div class="col-xs-11 pull-right">
+		<br>
+		  <button type="button" onclick="button_clicked(1)" class="btn btn-info"><span class="glyphicon glyphicon-cog"></span>  <label id="label10">Appliquer</label></button>&nbsp;
+		  <button type="button" onclick="button_clicked(2)" class="btn btn-info"><span class="glyphicon glyphicon-ok"></span><label id="label11">&nbsp;OK</label></button>&nbsp;
+		  <button type="button" onclick="button_clicked(3)" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span><label id="label12">&nbsp; Annuler</label></button>
+	</div><!-- col -->
+</div><!-- row -->
+</div><!-- container -->
 
-    function addPresetOption(msg){
-        var selectitem = document.getElementById("selectPreset");
-        if (selectitem) {
-            selectitem.options[selectitem.options.length] = new Option(msg,msg); 
-        }
-    }
-    
-    function saveCurrentPreset() {
-        rubyCalled( 'savepreset', 'true');
-    }
-    
-    function deleteCurrentPreset() {
-        var result = document.getElementById('selectPreset').value;
-        if (result !== 'Select a preset') {
-           rubyCalled( 'deletepreset', result);
-        }
-    }
+ 
 
-    // Listener for preset selection change
-    document.getElementById('selectPreset').addEventListener('change', function() {
-        var result = this.value;
-        if (result !== 'Select a preset') {
-            rubyCalled('selectpreset', result);
-        }
-    });
-    
-    function setPreset(presetName) {
-        // This function existed in the original file.
-        // It might be used to programmatically set the dropdown.
-        var selectitem = document.getElementById("selectPreset");
-        if(selectitem) {
-            selectitem.value = presetName;
-        }
-    }
-    
-    function submitenter(myfield,e) {
-        var keycode;
-        if (window.event) keycode = window.event.keyCode;
-        else if (e) keycode = e.which;
-        else return true;
-        
-        if (keycode == 13) {
-           rubyCalled( 'calcul', 'true');
-           return false;
-        }
-        else return true;
-    }
+ 
+  
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="./dist/js/bootstrap.min.js"></script>
+ <!--<script src="../../assets/js/docs.min.js"></script>-->
 
-    function rubyCalled( cb_name, msg ) {
-        try {
-            var fake_url = 'skp:' + cb_name + '@' + msg;
-            window.location.href = fake_url;
-        } catch(e) {
-            console.error("Error calling Ruby via skp: protocol. Is this running in SketchUp?", e);
-        }
-    }
-    
-function button_clicked(flag) {
-    const layoutDirection = document.querySelector('input[name="layoutdir"]:checked')?.value || "horizontal";
-    rubyCalled('applybardage', layoutDirection);
-    rubyCalled('calcul', flag);
-}
-    
+ 
+ <script type="text/javascript">
+ 
+	// Clear des options depuis ruby
+	//=====================================
+	function clearPresetOption(){
+		// Fill options of presets selector V4.6
+		var selectitem = document.getElementById("selectPreset");
+		//alert( labelString );
+		if (selectitem) {
+			selectitem.options.length = 0;
+		}
+	}
+	// Ajout de preset depuis ruby
+	//==============================
+	function addPresetOption(msg){
+		// Fill options of presets selector V4.6
+		var selectitem = document.getElementById("selectPreset");
+		//alert( labelString );
+		if (selectitem) {
+			selectitem.options[selectitem.options.length] = new Option(msg,msg); 
+		}
+	}
+	
+	// Sauvegarde d'un nouveau preset
+	//==================================
+	function saveCurrentPreset()
+	{
+		rubyCalled( 'savepreset', 'true');
+	}
+	
+	// Suppression du preset en cours
+	//==================================
+	function deleteCurrentPreset()
+	{
+		var result = $('#selectPreset').val();
+		rubyCalled( 'deletepreset', result);
+	}
+	
+	// Call back sur select
+	//============================
+	//parentOfPresetSelect
+	$(function() {
+		//$('#selectPreset').change(function(){
+		//$('body').on('change','#selectPreset',function(){
+		$('#selectPreset').on('change',function(){
+			var result = $(this).val();
+			//alert(result);
+			rubyCalled('selectpreset', result);
+			//alert(result);
+		});
+	});
+	
+	// @dialogOobOne.execute_script( 'setPreset( "'+@@s_presetname+'" );' ) # V6.0.0
+	//=============================
+	function setPreset(presetName)
+	{
+		//rubyCalled('selectpreset', presetName); a verifier avant de re activer (d  clenche des undo intempestifs
+		//alert(presetName);
+		
+	}
+	
+	// Callback sur enter
+	///====================================
+	function submitenter(myfield,e)
+	{
+		
+		var keycode;
+		if (window.event) 
+			keycode = window.event.keyCode;
+		else 
+			if (e) 
+				keycode = e.which;
+			else 
+				return true;
+		
+		//alert(keycode);
+		if (keycode == 13)
+		   {
+		   // FIX: Call button_clicked on enter for consistency
+		   button_clicked(1); // 1 = Apply
+		   return false;
+		   }
+		else
+		   return true;
+	}
+
+	function rubyCalled( cb_name, msg ) {
+		fake_url = 'skp:' + cb_name + '@' + msg
+		//alert( fake_url);
+		window.location.href = fake_url
+	}
+	
+    // *** FIXED FUNCTION ***
+    // This now only sends the action flag (1, 2, or 3).
+    // The Ruby script is responsible for getting all element values.
+	function button_clicked(flag) {
+		rubyCalled( 'calcul', flag.toString());
+	}
+	
     function messageFromSketchUp(msg) {
-        // This function existed in the original file.
-        // It is a generic callback handler for data from SketchUp.
-        console.log('messageFromSketchUp received: ' + msg);
+        alert('SketchUp returned "' + msg + '"');
         var reg = new RegExp("[;]+", "g");
         var tableau = msg.split(reg);
+        // This function seems to be for a different purpose, leaving as is.
+        if(document.getElementById("text3")) document.getElementById("text3").value = tableau[0] || '';
+        if(document.getElementById("text4")) document.getElementById("text4").value = tableau[1] || '';
+        if(document.getElementById("text6")) document.getElementById("text6").value = tableau[3] || '';
+        if(document.getElementById("text7")) document.getElementById("text7").value = tableau[4] || '';
+        if(document.getElementById("textGisMaxi")) document.getElementById("textGisMaxi").value = tableau[6] || '';
+        OnColorValuehandler && OnColorValuehandler();
     }
-            
-    function setRadioValue(val){
-        document.getElementById("inputstartpoint").value = val;
-        // Trigger calculation on change
-        rubyCalled('calcul', 'true');
-    }
+		
+	// Call back sur radio buttons	
+	function setRadioValue(val){
+		//alert(val);
+		document.getElementById("inputstartpoint").value = val;
+	}
+	// Compute par code ruby
+	function compute(msg){
+		//alert("");
+		rubyCalled( 'calcul', 'true');
+	}
 
-    function compute(msg){
-        rubyCalled( 'calcul', 'true');
-    }
+	function setLabel(msg){
+		<!-- alert( msg );  -->
+		var tableau=msg.split(';');
+		var label = tableau[0]; // attention c'est en dur, p-e faire une fonction plus intelligente (comme logiciel)
+		var labelString = tableau[1];
+		var item = document.getElementById(label);
+		//alert( labelString );
+		if (item) {
+			item.innerHTML = labelString
+		}
+		
+	}
 
-    function setLabel(msg){
-        var tableau=msg.split(';');
-        var label = tableau[0];
-        var labelString = tableau[1];
-        var item = document.getElementById(label);
-        if (item) {
-            item.innerHTML = labelString;
-        }
-    }
-
-    function setButtonLabel(msg){
-        var tableau=msg.split(';');
-        var label = tableau[0];
-        var labelString = tableau[1];
-        var item = document.getElementById(label);
-        if (item) {
-            item.value = labelString;
-        }
-    }
-
-    function setValue(msg){
-        var tableau=msg.split(';');
-        var label = tableau[0];
-        var labelString = tableau[1].replace(/#/g,";"); // # is used for multi-values
-        var item = document.getElementById(label);
-        if (item) {
-            item.value = labelString;
-        }
-        
-        if(label == "inputstartpoint"){
-            if(labelString == "1") {
-                document.getElementById('option1').checked = true;
-            }
-            if(labelString == "2") {
-                document.getElementById('option2').checked = true;
-            }
-            if(labelString == "3"){
-                document.getElementById('option3').checked = true;
-            }
-        }
-    }
-
-    function setCheckValue(msg){
-        var tableau=msg.split(';');
-        var label = tableau[0];
-        var labelString = tableau[1];
-        var item = document.getElementById(label);
-        if (item) {
-            item.checked = (labelString == "true");
-        }
-    }
-
-    function onCheckChange(){
-        // This function was in the original file, likely for a checkbox that is no longer visible
-        // but the logic is preserved in case it's used with a hidden element.
-        var isChecked = document.getElementById("input10") ? document.getElementById("input10").checked : false;
-        if(document.getElementById("input10")) {
-            document.getElementById("input10").value = isChecked ? "true" : "false";
-        }
-    }
+	function setButtonLabel(msg){
+		var tableau=msg.split(';');
+		var label = tableau[0]; // attention c'est en dur, p-e faire une fonction plus intelligente (comme logiciel)
+		var labelString = tableau[1];
+		var item = document.getElementById(label);
+		alert( item );
+		if (item) {
+			alert( item );
+			item.value = labelString
+		}
+	}
+	function setValue(msg){
+		
+		var tableau=msg.split(';');
+		var label = tableau[0]; // attention c'est en dur, p-e faire une fonction plus intelligente (comme logiciel)
+		//if(label == "input3") alert(tableau[1]);
+		var labelString = tableau[1].replace(/#/g,";"); // #2 multi values
+		//if(label == "input3") alert(labelString);
+		var item = document.getElementById(label)
+		if (item) {
+			//			alert( msg );
+			item.value = labelString
+		}
+		
+		if(label == "inputstartpoint"){
+			
+			if(labelString == "1")	{
+				$('#labeloption1').addClass('active');
+				$('#labeloption2').removeClass('active');
+				$('#labeloption3').removeClass('active');
+			}
+			if(labelString == "2") {
+				$('#labeloption1').removeClass('active');
+				$('#labeloption2').addClass('active');
+				$('#labeloption3').removeClass('active');
+			}
+			if(labelString == "3"){
+				//alert("radio set value"+labelString);
+				$('#labeloption1').removeClass('active');
+				$('#labeloption2').removeClass('active');
+				$('#labeloption3').addClass('active');
+			}
+		}
+		//document.getElementById("button").value = 'test'
+	}
+	function setCheckValue(msg){
+		
+		var tableau=msg.split(';');
+		var label = tableau[0]; // attention c'est en dur, p-e faire une fonction plus intelligente (comme logiciel)
+		var labelString = tableau[1];
+		var item = document.getElementById(label)
+		if (item) {
+			if (labelString == "false"){
+				item.checked = false;
+				item.value = "false";
+				//alert( msg ); 
+			}
+			else{
+				item.checked = true;
+				item.value = "true";
+				//alert( msg ); 
+			}
+		}
+		//document.getElementById("button").value = 'test'
+	}
+	function onCheckChange(){
+		  //$(this).change(function(){
+		valeurCoche = document.getElementById("input10").checked;  
+		//alert(valeurCoche);
+		if (valeurCoche){
+			document.getElementById("input10").value = "true";
+			//alert( "true" ); 
+		} else{
+			document.getElementById("input10").value = "false";
+			//$(this).val("false");
+			//alert( "false" ); 
+		}
+		 // });
+	}
 </script>
 
-</body>
-</html>
-<script>
-    // Initialize the radio button based on the inputstartpoint value
-    document.addEventListener('DOMContentLoaded', function() {
-        var startPoint = document.getElementById("inputstartpoint").value;
-        if (startPoint === "1") {
-            document.getElementById("option1").checked = true;
-        } else if (startPoint === "2") {
-            document.getElementById("option2").checked = true;
-        } else if (startPoint === "3") {
-            document.getElementById("option3").checked = true;
-        }
-    });
+
+
+
+</div></font></body><!-- Bootstrap core JavaScript
+  ================================================== --><!-- Placed at the end of the document so the pages load faster --></html><!-- end ofOobOne.html -->
