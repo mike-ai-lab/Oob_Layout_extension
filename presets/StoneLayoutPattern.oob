@@ -1,0 +1,18 @@
+Oob preset parameters;StoneLayoutPattern;
+@@i_unit;4;
+@@f_longueurBardage;0.6;0.3;0.6;
+@@f_hauteurBardage;0.3;0.8;0.3;
+@@f_randomlongueurBardage;0;
+@@f_randomhauteurBardage;0;
+@@f_layeroffset;0.0;
+@@f_heightoffset;0.0;
+@@f_lengthoffset;0.0;
+@@f_randomepaisseurBardage;0.0;
+@@f_randomColor;0;
+@@f_epaisseurBardage;0.03;
+@@f_jointLongueur;0.005;
+@@f_jointLargeur;0.005;
+@@f_jointProfondeur;0.003;
+@@f_decalageRangees;0.0;
+@@s_colorname;<auto>34;
+@@i_startpoint;1;

@@ -1558,9 +1558,9 @@ module BR_OOB
 		
 		
 		if(b_jointperdu == "true")
-			jointsPerdusflag = 0 # POUR EVITER 1 avant fin dev v5 NI 008
+			jointsPerdusflag = 1 # Enable staggered joint layout
 		else
-			jointsPerdusflag = 0
+			jointsPerdusflag = 0 # Disable staggered joint layout
 		end
 		
 		puts "f_longueurBardage" if(trace == 1) 
@@ -1589,9 +1589,8 @@ module BR_OOB
 		# on cree un groupe OOB1 qui va contenir une copie de la face originale et le calepinage
 		oob1grp = facep.m_Face.parent.entities.add_group
 		oob1grp.name = "Oob-grp"
-	
 		#on duplique tout de suite la face dans un groupe distinct (pour recup de la facep  originale)
-		origfacegrp = oob1grp.entities.add_group 
+		origfacegrp = oob1grp.entities.add_group
 		origfacegrp.name= "Oob-init"
 		BR_OOB.DuplicateFacesToEntities(origfacegrp.entities, facep.m_Face)
 		origfacegrp.hidden = true
@@ -1610,23 +1609,29 @@ module BR_OOB
 		meanPoint = BR_GeomTools.getMeanPoint(verticelist)
 		meanPoint.transform! facep.m_Matrice
 			
-		# si une edge est selectionne on la prend comme reference sinon onr recupere la longest edge
-		# recup de l'edge selectionnee ou de l'arete la plus longue
-		sel = Sketchup.active_model.selection
-		longestedge = nil
-	
-		if (sel[0].kind_of? Sketchup::Edge)
-			longestedge = sel[0]
+		# V7.0 Pattern rotation control
+		pattern_rotation = @dialogOobOne.get_element_value("patternRotation").to_s
+		if pattern_rotation == "vertical"
+			vectlongest = Geom::Vector3d.new(0, 0, 1)
+		else
+			# si une edge est selectionne on la prend comme reference sinon onr recupere la longest edge
+			# recup de l'edge selectionnee ou de l'arete la plus longue
+			sel = Sketchup.active_model.selection
+			longestedge = nil
+		
+			sel.each do |entity|
+				if entity.is_a? Sketchup::Edge
+					longestedge = entity
+					break
+				end
+			end
+					
+			# Recup de l'arete la plus longue => VectX
+			if(longestedge == nil)
+				longestedge = BR_GeomTools.getLongestEdge(facep.m_Face)
+			end
+			vectlongest = longestedge.line[1]
 		end
-		if (sel[1].kind_of? Sketchup::Edge)
-			longestedge = sel[1]
-		end
-				
-		# Recup de l'arete la plus longue => VectX
-		if(longestedge == nil)
-			longestedge = BR_GeomTools.getLongestEdge(facep.m_Face)
-		end
-		vectlongest = longestedge.line[1]
 		
 		origin = Geom::Point3d.new 0,0,0 
 		startpoint = Geom::Point3d.new 0,0,0 

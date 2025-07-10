@@ -150,7 +150,34 @@ $(document).ready(function() {
 
 	}
 
-
+	// Robust Client-Side Synchronization for Input Fields
+	// Replace field IDs with your actual synchronized input field pairs
+	
+	// Synchronization for Length fields (input2 and input5)
+	$('#input2').on('input', function() {
+		const currentValue = $(this).val();
+		$('#input5').val(currentValue);
+		logToRuby('User input synchronized input5 with input2: ' + currentValue);
+	});
+	
+	$('#input5').on('input', function() {
+		const currentValue = $(this).val();
+		$('#input2').val(currentValue);
+		logToRuby('User input synchronized input2 with input5: ' + currentValue);
+	});
+	
+	// Synchronization for Height fields (input3 and input6)
+	$('#input3').on('input', function() {
+		const currentValue = $(this).val();
+		$('#input6').val(currentValue);
+		logToRuby('User input synchronized input6 with input3: ' + currentValue);
+	});
+	
+	$('#input6').on('input', function() {
+		const currentValue = $(this).val();
+		$('#input3').val(currentValue);
+		logToRuby('User input synchronized input3 with input6: ' + currentValue);
+	});
 
 	//TODO: was moved from window.load due to IE not firing consist
 
@@ -2774,11 +2801,51 @@ function setValue(pair) {
 	const el = document.getElementById(id);
 	if (el) {
 		el.value = value;
+
+		// Enhanced synchronization for specific paired fields
+		// Replace 'inputFieldA' and 'inputFieldB' with your actual input field IDs that need synchronization
+		if (id === 'input2') { // Length field
+			const otherEl = document.getElementById('input5'); // Space length field
+			if (otherEl) {
+				otherEl.value = value; // Directly set the value of the mirrored field
+				logToRuby('Synchronized input5 with input2: ' + value);
+			}
+		} else if (id === 'input5') { // Space length field
+			const otherEl = document.getElementById('input2'); // Length field
+			if (otherEl) {
+				otherEl.value = value; // Directly set the value of the mirrored field
+				logToRuby('Synchronized input2 with input5: ' + value);
+			}
+		} else if (id === 'input3') { // Height field
+			const otherEl = document.getElementById('input6'); // Space height field
+			if (otherEl) {
+				otherEl.value = value; // Directly set the value of the mirrored field
+				logToRuby('Synchronized input6 with input3: ' + value);
+			}
+		} else if (id === 'input6') { // Space height field
+			const otherEl = document.getElementById('input3'); // Height field
+			if (otherEl) {
+				otherEl.value = value; // Directly set the value of the mirrored field
+				logToRuby('Synchronized input3 with input6: ' + value);
+			}
+		}
+
+		// Keep the original dispatchEvent for other potential listeners (optional, but good practice)
 		if (el.dispatchEvent) {
 			el.dispatchEvent(new Event('input'));
 		}
 	} else {
 		console.warn("Field not found:", id);
+	}
+}
+
+// Function to send debug messages to Ruby Console
+function logToRuby(message) {
+	if (typeof Sketchup !== 'undefined' && Sketchup.callback) {
+		Sketchup.callback('log_message', message);
+	} else {
+		console.log("Not in SketchUp or callback not available:", message);
+		// Optional: alert("Debug (outside SketchUp): " + message);
 	}
 }
 

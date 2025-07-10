@@ -1,3 +1,11 @@
 {
-    "diffEditor.codeLens": true
+    "diffEditor.codeLens": true,
+    "files.exclude": {
+        "**/backup_oobrb.rb": true
+    },
+    "search.exclude": {
+        "**/backup_oobrb.rb": true
+    }
 }
+// This file is used to configure settings for the VS Code editor.
+// It includes settings for the diff editor, file exclusion, and search exclusion.
