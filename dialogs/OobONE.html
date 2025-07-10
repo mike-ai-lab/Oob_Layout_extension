@@ -532,9 +532,8 @@
 
 <script>
   $(document).ready(function() {
-    // Function to populate the dropdown
     function populateDropdown() {
-      var values = $('#input3').val().split(';').map(function(item) {
+      var values = $('#input3').val().replace(/;/g, ',').split(',').map(function(item) {
         return item.trim();
       }).filter(function(item) {
         return item !== '';
@@ -542,8 +541,6 @@
 
       var dropdown = $('#startRowHeight');
       var selectedValue = dropdown.val();
-      
-      // Preserve the "Auto" option
       dropdown.find('option[value!="auto"]').remove();
 
       values.forEach(function(value) {
@@ -553,7 +550,6 @@
         }));
       });
 
-      // Restore the previously selected value if it still exists
       if (values.includes(selectedValue)) {
         dropdown.val(selectedValue);
       } else {
@@ -561,10 +557,28 @@
       }
     }
 
-    // Event listener for the input field
     $('#input3').on('keyup', function() {
       populateDropdown();
     });
+
+    $('#startRowHeight').on('change', function() {
+      var selectedValue = $(this).val();
+      if (selectedValue === 'auto') return;
+
+      var values = $('#input3').val().replace(/;/g, ',').split(',').map(function(item) {
+        return item.trim();
+      });
+
+      var index = values.indexOf(selectedValue);
+      if (index > -1) values.splice(index, 1);
+      $('#input3').val([selectedValue].concat(values).join(','));
+      populateDropdown();
+    });
+
+    populateDropdown();
+  });
+</script>
+
 
     // Event listener for the dropdown
     $('#startRowHeight').on('change', function() {
