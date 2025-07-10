@@ -1938,7 +1938,11 @@ module BR_OOB
 				lengthY =  result[0]
 				heightIndexTab = result[1]
 				puts "lengthY = #{lengthY}"
-			end	
+			end
+			if first_row && start_row_height != "auto"
+				lengthY = start_row_height.to_f * unitconversion
+			end
+			first_row = false	
 								
 			#lengthY = f_hauteurBardage*(1.0 + randomvalueY*f_randomhauteurBardage)
 			

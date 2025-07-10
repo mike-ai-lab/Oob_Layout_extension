@@ -530,7 +530,71 @@
 	}
 </script>
 
+<script>
+  $(document).ready(function() {
+    // Function to populate the dropdown
+    function populateDropdown() {
+      var values = $('#input3').val().split(';').map(function(item) {
+        return item.trim();
+      }).filter(function(item) {
+        return item !== '';
+      });
 
+      var dropdown = $('#startRowHeight');
+      var selectedValue = dropdown.val();
+      
+      // Preserve the "Auto" option
+      dropdown.find('option[value!="auto"]').remove();
+
+      values.forEach(function(value) {
+        dropdown.append($('<option>', {
+          value: value,
+          text: value
+        }));
+      });
+
+      // Restore the previously selected value if it still exists
+      if (values.includes(selectedValue)) {
+        dropdown.val(selectedValue);
+      } else {
+        dropdown.val('auto');
+      }
+    }
+
+    // Event listener for the input field
+    $('#input3').on('keyup', function() {
+      populateDropdown();
+    });
+
+    // Event listener for the dropdown
+    $('#startRowHeight').on('change', function() {
+      var selectedValue = $(this).val();
+      if (selectedValue === 'auto') {
+        return; // Do nothing if "Auto" is selected
+      }
+
+      var values = $('#input3').val().split(';').map(function(item) {
+        return item.trim();
+      });
+
+      // Remove the selected value from the array
+      var index = values.indexOf(selectedValue);
+      if (index > -1) {
+        values.splice(index, 1);
+      }
+
+      // Add the selected value to the beginning of the array
+      values.unshift(selectedValue);
+
+      // Update the input field and repopulate the dropdown
+      $('#input3').val(values.join('; '));
+      populateDropdown();
+    });
+
+    // Initial population of the dropdown
+    populateDropdown();
+  });
+</script>
 
 
 </div></font></body><!-- Bootstrap core JavaScript
