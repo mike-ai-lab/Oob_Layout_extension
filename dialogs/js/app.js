@@ -2850,6 +2850,7 @@ function logToRuby(message) {
 }
 
 // --- OOB ADVANCED CONTROLS: Collect and send new UI values to Ruby ---
+// --- OOB ADVANCED CONTROLS: Collect and send new UI values to Ruby ---
 function getOobAdvancedControls() {
 	return {
 		patternRotation: document.getElementById('patternRotation')?.value || 'horizontal',
@@ -2877,3 +2878,20 @@ function setRowHeightOptions(heights) {
 	});
 }
 
+// --- Override SketchUp -> JS bridge to auto-trigger height sync ---
+window.setValue = function(pair) {
+	const tab = pair.split(';');
+	const name = tab[0];
+	const value = tab[1];
+	const elt = document.getElementById(name);
+	if (elt) elt.value = value;
+
+	if (name === 'input3') {
+		setTimeout(() => {
+			const $input = $('#input3');
+			$input.focus();
+			$input.trigger('keyup');
+			$input.blur();
+		}, 50);
+	}
+};

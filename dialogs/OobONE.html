@@ -102,6 +102,7 @@
 			<button class="btn btn-info" type="button" onclick="" style="width:120px"><span class="glyphicon glyphicon-resize-vertical"></span> <span id="label3"> Height </span></button>
 			<div class="btn-group" title="Single value or value1;value2;value3;...">
 				<input type="text" size="4" class="form-control" placeholder="0.0" id="input3" onkeydown="return submitenter(this,event);">	
+				<input type="hidden" id="input3_storage" name="input3_storage" />
 			</div>
 			<div class="btn-group">
 			
@@ -241,14 +242,14 @@
   <label><input type="checkbox" id="forceFullRow" value="false" onchange="this.value = this.checked;"> Force Full Row as First Row</label>
 </div>
 
-<!-- Starting Row Height Control (populated dynamically) -->
+<!-- Starting Row Height Control -->
 <div class="btn-group" style="margin-top:10px;">
   <label for="startRowHeight">Starting Row Height:</label>
   <select class="form-control" id="startRowHeight" style="width:auto; display:inline-block; margin-left:10px;">
-	<option value="auto">Auto</option>
-	<!-- Heights will be populated by JS -->
+    <!-- Options will be populated by JavaScript -->
   </select>
 </div>
+
 <!-- Last Row Placement Control -->
 <div class="btn-group" style="margin-top:10px;">
   <label for="lastRowPlacement">Last Row Placement:</label>
@@ -531,84 +532,94 @@
 </script>
 
 <script>
-  $(document).ready(function() {
-    function populateDropdown() {
-      var values = $('#input3').val().replace(/;/g, ',').split(',').map(function(item) {
-        return item.trim();
-      }).filter(function(item) {
-        return item !== '';
-      });
-
-      var dropdown = $('#startRowHeight');
-      var selectedValue = dropdown.val();
-      dropdown.find('option[value!="auto"]').remove();
-
-      values.forEach(function(value) {
-        dropdown.append($('<option>', {
-          value: value,
-          text: value
-        }));
-      });
-
-      if (values.includes(selectedValue)) {
-        dropdown.val(selectedValue);
-      } else {
-        dropdown.val('auto');
-      }
+// Starting Row Height Control - Properly handles semicolon-separated values
+$(document).ready(function() {
+    
+    function updateStartRowHeightDropdown() {
+        console.log('Updating dropdown...');
+        
+        // Get the height input value
+        var heightValue = $('#input3').val();
+        console.log('Height value:', heightValue);
+        
+        if (!heightValue || heightValue.trim() === '') {
+            console.log('No height value, clearing dropdown');
+            $('#startRowHeight').empty();
+            return;
+        }
+        
+        // Split by semicolon and clean up values
+        var heightValues = heightValue.split(';')
+            .map(function(val) { return val.trim(); })
+            .filter(function(val) { return val !== '' && val !== '0' && val !== '0.0'; });
+        
+        console.log('Height values array:', heightValues);
+        
+        var dropdown = $('#startRowHeight');
+        var currentSelection = dropdown.val();
+        
+        // Clear and repopulate dropdown
+        dropdown.empty();
+        
+        if (heightValues.length > 0) {
+            heightValues.forEach(function(value) {
+                dropdown.append('<option value="' + value + '">' + value + '</option>');
+            });
+            
+            // Restore previous selection if it still exists
+            if (heightValues.indexOf(currentSelection) !== -1) {
+                dropdown.val(currentSelection);
+            } else {
+                dropdown.val(heightValues[0]); // Select first value
+            }
+        }
+        
+        console.log('Dropdown updated with', heightValues.length, 'options');
     }
-
-    $('#input3').on('keyup', function() {
-      populateDropdown();
+    
+    // Update dropdown when height input changes
+    $('#input3').on('input keyup change', function() {
+        console.log('Input3 changed');
+        updateStartRowHeightDropdown();
     });
-
+    
+    // Handle dropdown selection change
     $('#startRowHeight').on('change', function() {
-      var selectedValue = $(this).val();
-      if (selectedValue === 'auto') return;
-
-      var values = $('#input3').val().replace(/;/g, ',').split(',').map(function(item) {
-        return item.trim();
-      });
-
-      var index = values.indexOf(selectedValue);
-      if (index > -1) values.splice(index, 1);
-      $('#input3').val([selectedValue].concat(values).join(','));
-      populateDropdown();
+        var selectedValue = $(this).val();
+        console.log('Dropdown selection changed to:', selectedValue);
+        
+        if (!selectedValue) return;
+        
+        // Get current height values
+        var heightValue = $('#input3').val();
+        if (!heightValue || heightValue.trim() === '') return;
+        
+        var heightValues = heightValue.split(';')
+            .map(function(val) { return val.trim(); })
+            .filter(function(val) { return val !== '' && val !== '0' && val !== '0.0'; });
+        
+        // Remove selected value from its current position
+        heightValues = heightValues.filter(function(val) { return val !== selectedValue; });
+        
+        // Add selected value to the beginning
+        heightValues.unshift(selectedValue);
+        
+        // Update input3 with new order (semicolon-separated)
+        $('#input3').val(heightValues.join(';'));
+        
+        console.log('Updated input3 to:', heightValues.join(';'));
+        
+        // Update dropdown to reflect new order
+        updateStartRowHeightDropdown();
     });
-
-    populateDropdown();
-  });
+    
+    // Initial population
+    updateStartRowHeightDropdown();
+    
+    console.log('Starting Row Height control initialized');
+});
 </script>
 
-
-    // Event listener for the dropdown
-    $('#startRowHeight').on('change', function() {
-      var selectedValue = $(this).val();
-      if (selectedValue === 'auto') {
-        return; // Do nothing if "Auto" is selected
-      }
-
-      var values = $('#input3').val().split(';').map(function(item) {
-        return item.trim();
-      });
-
-      // Remove the selected value from the array
-      var index = values.indexOf(selectedValue);
-      if (index > -1) {
-        values.splice(index, 1);
-      }
-
-      // Add the selected value to the beginning of the array
-      values.unshift(selectedValue);
-
-      // Update the input field and repopulate the dropdown
-      $('#input3').val(values.join('; '));
-      populateDropdown();
-    });
-
-    // Initial population of the dropdown
-    populateDropdown();
-  });
-</script>
 
 
 </div></font></body><!-- Bootstrap core JavaScript

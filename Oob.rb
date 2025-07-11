@@ -1115,7 +1115,7 @@ module BR_OOB
 				#puts "nblongueurs = #{@@f_tabLongueurBardage.length}"
 				
 				
-				#@@f_hauteurBardage = @dialogOobOne.get_element_value("input3").to_f
+				#@@f_hauteurBardage = @dialogOobOne.get_element_value("input3")@@f_tabHauteurBardage = @dialogOobOne.get_element_value("input3").split(/[,;#]/).map(&:to_f)
 				strlong =  @dialogOobOne.get_element_value("input3")
 				tab = strlong.split(';')
 				if(tab.size() > 1)
@@ -3085,7 +3085,7 @@ if( true ) #not file_loaded?(__FILE__) ) # A enlever pour la release
 
   # Remove all existing items from the toolbar (cleanup for reloads)
   while toolbar.count > 0
-	toolbar.remove_item(toolbar[0])
+	toolbar.remove_item(0)
   end
 
   # Commande principale OOB : calcul de callepinage
