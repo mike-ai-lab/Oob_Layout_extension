@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oob Layouts - Enhanced</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="./dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 10px;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+        
+        .input-group-enhanced {
+            margin-bottom: 15px;
+        }
+        
+        .input-group-enhanced label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .input-main {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .input-random {
+            width: 80px;
+        }
+        
+        .input-offset {
+            width: 80px;
+        }
+        
+        .btn-icon {
+            width: 140px;
+            text-align: left;
+        }
+        
+        .advanced-controls {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .radio-group .btn {
+            min-width: 40px;
+        }
+        
+        .preset-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .preset-controls select {
+            flex: 1;
+        }
+        
+        .action-buttons {
+            text-align: right;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .action-buttons .btn {
+            margin-left: 10px;
+        }
+        
+        .help-text {
+            font-size: 0.875em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        
+        .validation-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 576px) {
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .input-main, .input-random, .input-offset {
+                width: 100%;
+            }
+            
+            .radio-group {
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                text-align: center;
+            }
+            
+            .action-buttons .btn {
+                margin: 5px;
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Preset Management -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="glyphicon glyphicon-saved"></i> Presets
+            </div>
+            <div class="preset-controls">
+                <select class="form-control" id="selectPreset" aria-label="Select preset">
+                    <option>Select a preset</option>
+                </select>
+                <button type="button" class="btn btn-success" onclick="saveCurrentPreset()" 
+                        title="Save current settings as preset" aria-label="Save preset">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteCurrentPreset()" 
+                        title="Delete selected preset" aria-label="Delete preset">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Basic Dimensions -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="glyphicon glyphicon-resize-full"></i> Dimensions
+            </div>
+            
+            <!-- Length -->
+            <div class="input-group-enhanced">
+                <label for="input2" id="label2">Length (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-resize-horizontal"></span> Length
+                    </button>
+                    <input type="text" class="form-control input-main" id="input2" 
+                           placeholder="4.5" aria-describedby="length-help"
+                           title="Single value or semicolon-separated values (e.g., 4.5;3.0;5.5)">
+                    <label class="sr-only" for="inputrand2">Length randomization</label>
+                    <input type="text" class="form-control input-random" id="inputrand2" 
+                           placeholder="0.0" title="Random factor (0.0 - 1.0)" 
+                           aria-label="Length randomization factor">
+                </div>
+                <div class="help-text" id="length-help">
+                    Enter single value or multiple values separated by semicolons
+                </div>
+            </div>
+
+            <!-- Height -->
+            <div class="input-group-enhanced">
+                <label for="input3" id="label3">Height (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-resize-vertical"></span> Height
+                    </button>
+                    <input type="text" class="form-control input-main" id="input3" 
+                           placeholder="1.0" aria-describedby="height-help"
+                           title="Single value or semicolon-separated values">
+                    <input type="hidden" id="input3_storage" name="input3_storage">
+                    <label class="sr-only" for="inputrand3">Height randomization</label>
+                    <input type="text" class="form-control input-random" id="inputrand3" 
+                           placeholder="0.0" title="Random factor (0.0 - 1.0)"
+                           aria-label="Height randomization factor">
+                </div>
+                <div class="help-text" id="height-help">
+                    Enter single value or multiple values separated by semicolons
+                </div>
+            </div>
+
+            <!-- Thickness -->
+            <div class="input-group-enhanced">
+                <label for="input4" id="label4">Thickness (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-fullscreen"></span> Thickness
+                    </button>
+                    <input type="text" class="form-control input-main" id="input4" 
+                           placeholder="0.02" aria-describedby="thickness-help">
+                    <label class="sr-only" for="inputrand4">Thickness randomization</label>
+                    <input type="text" class="form-control input-random" id="inputrand4" 
+                           placeholder="0.0" title="Random factor (0.0 - 1.0)"
+                           aria-label="Thickness randomization factor">
+                </div>
+                <div class="help-text" id="thickness-help">
+                    Thickness of the cladding elements
+                </div>
+            </div>
+        </div>
+
+        <!-- Joints and Spacing -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="glyphicon glyphicon-th"></i> Joints & Spacing
+            </div>
+
+            <!-- Joint Length -->
+            <div class="input-group-enhanced">
+                <label for="input5" id="label5">Joint Length (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-resize-horizontal"></span> Joint Length
+                    </button>
+                    <input type="text" class="form-control input-main" id="input5" 
+                           placeholder="0.005" aria-describedby="joint-length-help">
+                    <label class="sr-only" for="inputlengthoffset">Length offset</label>
+                    <input type="text" class="form-control input-offset" id="inputlengthoffset" 
+                           placeholder="0.0" title="Length offset" aria-label="Length offset">
+                </div>
+                <div class="help-text" id="joint-length-help">
+                    Horizontal spacing between elements
+                </div>
+            </div>
+
+            <!-- Joint Height -->
+            <div class="input-group-enhanced">
+                <label for="input6" id="label6">Joint Height (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-resize-vertical"></span> Joint Height
+                    </button>
+                    <input type="text" class="form-control input-main" id="input6" 
+                           placeholder="0.005" aria-describedby="joint-height-help">
+                    <label class="sr-only" for="inputheightoffset">Height offset</label>
+                    <input type="text" class="form-control input-offset" id="inputheightoffset" 
+                           placeholder="0.0" title="Height offset" aria-label="Height offset">
+                </div>
+                <div class="help-text" id="joint-height-help">
+                    Vertical spacing between rows
+                </div>
+            </div>
+
+            <!-- Joint Depth -->
+            <div class="input-group-enhanced">
+                <label for="input7" id="label7">Joint Depth (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-sort"></span> Joint Depth
+                    </button>
+                    <input type="text" class="form-control input-main" id="input7" 
+                           placeholder="0.005" aria-describedby="joint-depth-help">
+                    <label class="sr-only" for="inputlayeroffset">Depth offset</label>
+                    <input type="text" class="form-control input-offset" id="inputlayeroffset" 
+                           placeholder="0.0" title="Depth offset" aria-label="Depth offset">
+                </div>
+                <div class="help-text" id="joint-depth-help">
+                    Depth of joints between elements
+                </div>
+            </div>
+
+            <!-- Row Offset -->
+            <div class="input-group-enhanced">
+                <label for="input8" id="label8">Row Offset (cm)</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-transfer"></span> Row Offset
+                    </button>
+                    <input type="text" class="form-control input-main" id="input8" 
+                           placeholder="1.5" aria-describedby="row-offset-help">
+                    
+                    <!-- Start Position Radio Buttons -->
+                    <div class="radio-group" data-toggle="buttons" role="group" aria-label="Start position">
+                        <label class="btn btn-default active" id="labeloption1" 
+                               title="Start from left" onclick="setRadioValue(1)">
+                            <input type="radio" name="options" id="option1" checked>
+                            <span class="glyphicon glyphicon-align-left"></span>
+                        </label>
+                        <label class="btn btn-default" id="labeloption2" 
+                               title="Start from center" onclick="setRadioValue(2)">
+                            <input type="radio" name="options" id="option2">
+                            <span class="glyphicon glyphicon-align-center"></span>
+                        </label>
+                        <label class="btn btn-default" id="labeloption3" 
+                               title="Start from right" onclick="setRadioValue(3)">
+                            <input type="radio" name="options" id="option3">
+                            <span class="glyphicon glyphicon-align-right"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="help-text" id="row-offset-help">
+                    Horizontal offset between rows for staggered pattern
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Layout Controls -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="glyphicon glyphicon-cog"></i> Advanced Layout Controls
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Pattern Direction -->
+                    <div class="control-group">
+                        <label for="patternRotation">Pattern Direction:</label>
+                        <select class="form-control" id="patternRotation" aria-describedby="pattern-help">
+                            <option value="horizontal">Horizontal</option>
+                            <option value="vertical">Vertical</option>
+                        </select>
+                        <div class="help-text" id="pattern-help">
+                            Direction of the cladding pattern
+                        </div>
+                    </div>
+
+                    <!-- Start From -->
+                    <div class="control-group">
+                        <label for="startFrom">Start From:</label>
+                        <select class="form-control" id="startFrom" aria-describedby="start-help">
+                            <option value="bottom">Bottom</option>
+                            <option value="top">Top</option>
+                        </select>
+                        <div class="help-text" id="start-help">
+                            Starting edge for layout generation
+                        </div>
+                    </div>
+
+                    <!-- Force Full Row -->
+                    <div class="control-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="forceFullRow" value="false" 
+                                       onchange="this.value = this.checked;">
+                                Force Full Row as First Row
+                            </label>
+                        </div>
+                        <div class="help-text">
+                            Ensure the first row uses full-size elements
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Starting Row Height -->
+                    <div class="control-group">
+                        <label for="startRowHeight">Starting Row Height:</label>
+                        <select class="form-control" id="startRowHeight" aria-describedby="start-height-help">
+                            <option value="auto">Auto</option>
+                        </select>
+                        <div class="help-text" id="start-height-help">
+                            Height for the first row (auto uses default height)
+                        </div>
+                    </div>
+
+                    <!-- Last Row Placement -->
+                    <div class="control-group">
+                        <label for="lastRowPlacement">Last Row Placement:</label>
+                        <select class="form-control" id="lastRowPlacement" aria-describedby="last-row-help">
+                            <option value="cut">Cut to Face Bounds</option>
+                            <option value="full">Full Piece (may extend past face bounds)</option>
+                        </select>
+                        <div class="help-text" id="last-row-help">
+                            How to handle the last row if it doesn't fit completely
+                        </div>
+                    </div>
+
+                    <!-- Staggered Joints -->
+                    <div class="control-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="input10" value="false" onchange="onCheckChange()">
+                                <span id="label13">Staggered Joints</span>
+                            </label>
+                        </div>
+                        <div class="help-text">
+                            Enable staggered joint pattern for more realistic appearance
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Material Settings -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="glyphicon glyphicon-tint"></i> Material Settings
+            </div>
+
+            <div class="input-group-enhanced">
+                <label for="input9" id="label9">Material Name</label>
+                <div class="input-row">
+                    <button class="btn btn-info btn-icon" type="button" disabled>
+                        <span class="glyphicon glyphicon-tint"></span> Material
+                    </button>
+                    <input type="text" class="form-control input-main" id="input9" 
+                           placeholder="Oob-1" aria-describedby="material-help">
+                    <label class="sr-only" for="inputrand5">Color randomization</label>
+                    <input type="text" class="form-control input-random" id="inputrand5" 
+                           placeholder="0.0" title="Number of colors (>2.0) + Random factor (0.0-1.0)"
+                           aria-label="Color randomization factor">
+                </div>
+                <div class="help-text" id="material-help">
+                    Material name or RGB values (e.g., "122,250,0" or "Wood-Pine")
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button type="button" class="btn btn-primary" onclick="button_clicked(1)" 
+                    title="Apply settings and generate layout">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span id="label10">Apply</span>
+            </button>
+            <button type="button" class="btn btn-success" onclick="button_clicked(2)" 
+                    title="Apply settings and close dialog">
+                <span class="glyphicon glyphicon-ok"></span>
+                <span id="label11">OK</span>
+            </button>
+            <button type="button" class="btn btn-default" onclick="button_clicked(3)" 
+                    title="Cancel and close dialog">
+                <span class="glyphicon glyphicon-remove"></span>
+                <span id="label12">Cancel</span>
+            </button>
+        </div>
+
+        <!-- Hidden inputs -->
+        <input type="hidden" id="inputstartpoint" value="1">
+        <input type="hidden" id="inputradiohidden" value="1">
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/jquery.min.js"></script>
+    <script src="./dist/js/bootstrap.min.js"></script>
+    <script src="./js/app_improved.js"></script>
+
+    <script>
+        // Additional initialization and helper functions
+        
+        // Preset management functions
+        function clearPresetOption() {
+            const selectElement = document.getElementById("selectPreset");
+            if (selectElement) {
+                selectElement.innerHTML = '<option>Select a preset</option>';
+            }
+        }
+
+        function addPresetOption(presetName) {
+            const selectElement = document.getElementById("selectPreset");
+            if (selectElement) {
+                const option = new Option(presetName, presetName);
+                selectElement.add(option);
+            }
+        }
+
+        function saveCurrentPreset() {
+            if (typeof OobPresets !== 'undefined') {
+                OobPresets.save();
+            } else {
+                // Fallback for direct Ruby call
+                const url = 'skp:savepreset@true';
+                window.location.href = url;
+            }
+        }
+
+        function deleteCurrentPreset() {
+            if (typeof OobPresets !== 'undefined') {
+                OobPresets.delete();
+            } else {
+                // Fallback for direct Ruby call
+                const selectElement = document.getElementById('selectPreset');
+                if (selectElement && selectElement.value) {
+                    const url = `skp:deletepreset@${selectElement.value}`;
+                    window.location.href = url;
+                }
+            }
+        }
+
+        function setPreset(presetName) {
+            const selectElement = document.getElementById('selectPreset');
+            if (selectElement) {
+                selectElement.value = presetName;
+            }
+        }
+
+        // Checkbox change handler
+        function onCheckChange() {
+            const checkbox = document.getElementById("input10");
+            if (checkbox) {
+                checkbox.value = checkbox.checked ? "true" : "false";
+            }
+        }
+
+        // Enhanced enter key handling
+        function submitenter(field, event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                button_clicked(1); // Apply
+                return false;
+            }
+            return true;
+        }
+
+        // Radio button handler
+        function setRadioValue(value) {
+            const hiddenInput = document.getElementById("inputstartpoint");
+            const radioHidden = document.getElementById("inputradiohidden");
+            
+            if (hiddenInput) hiddenInput.value = value;
+            if (radioHidden) radioHidden.value = value;
+
+            // Update button states
+            ['labeloption1', 'labeloption2', 'labeloption3'].forEach((id, index) => {
+                const label = document.getElementById(id);
+                if (label) {
+                    if (index + 1 === value) {
+                        label.classList.add('active');
+                    } else {
+                        label.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // Button click handler
+        function button_clicked(flag) {
+            if (typeof OobDialog !== 'undefined') {
+                switch (flag) {
+                    case 1: OobDialog.apply(); break;
+                    case 2: OobDialog.ok(); break;
+                    case 3: OobDialog.cancel(); break;
+                }
+            } else {
+                // Fallback for direct Ruby call
+                const url = `skp:calcul@${flag}`;
+                window.location.href = url;
+            }
+        }
+
+        // Compute function for Ruby callbacks
+        function compute() {
+            console.log('Compute function called from Ruby');
+        }
+
+        // Message handler for Ruby communication
+        function messageFromSketchUp(msg) {
+            console.log('Message from SketchUp:', msg);
+            // Handle any specific messages from Ruby here
+        }
+
+        // Initialize tooltips and other Bootstrap components
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[title]').tooltip();
+            
+            // Initialize popovers if any
+            $('[data-toggle="popover"]').popover();
+            
+            // Focus first input
+            $('#input2').focus();
+            
+            console.log('Oob Layouts Enhanced dialog initialized');
+        });
+    </script>
+</body>
+</html>

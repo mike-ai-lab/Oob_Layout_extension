@@ -1191,6 +1191,11 @@ module BR_OOB
 				force_full_row = @dialogOobOne.get_element_value("forceFullRow").to_s
 				start_row_height = @dialogOobOne.get_element_value("startRowHeight").to_s
 				last_row_placement = @dialogOobOne.get_element_value("lastRowPlacement").to_s
+				
+				# *** DEBUG: Show what values we're getting ***
+				puts "DEBUG: start_row_height = '#{start_row_height}'"
+				puts "DEBUG: pattern_rotation = '#{pattern_rotation}'"
+				puts "DEBUG: start_from = '#{start_from}'"
 
 				# Creation du calepinage
 				#=============================
@@ -1609,28 +1614,28 @@ module BR_OOB
 		meanPoint = BR_GeomTools.getMeanPoint(verticelist)
 		meanPoint.transform! facep.m_Matrice
 			
-		# V7.0 Pattern rotation control
-		pattern_rotation = @dialogOobOne.get_element_value("patternRotation").to_s
+		# V7.0 Pattern rotation control - use passed parameter
 		if pattern_rotation == "vertical"
 			vectlongest = Geom::Vector3d.new(0, 0, 1)
 		else
 			# si une edge est selectionne on la prend comme reference sinon onr recupere la longest edge
 			# recup de l'edge selectionnee ou de l'arete la plus longue
-			sel = Sketchup.active_model.selection
-			longestedge = nil
-		
-			sel.each do |entity|
-				if entity.is_a? Sketchup::Edge
-					longestedge = entity
-					break
-				end
+# Determine the primary direction vector from the longest or selected edge
+		sel = Sketchup.active_model.selection
+		longestedge = nil
+
+		sel.each do |entity|
+			if entity.is_a? Sketchup::Edge
+				longestedge = entity
+				break
 			end
-					
-			# Recup de l'arete la plus longue => VectX
-			if(longestedge == nil)
-				longestedge = BR_GeomTools.getLongestEdge(facep.m_Face)
-			end
-			vectlongest = longestedge.line[1]
+		end
+
+		# Recup de l'arete la plus longue => VectX
+		if(longestedge == nil)
+			longestedge = BR_GeomTools.getLongestEdge(facep.m_Face)
+		end
+		vectlongest = longestedge.line[1]
 		end
 		
 		origin = Geom::Point3d.new 0,0,0 
@@ -1913,23 +1918,22 @@ module BR_OOB
 			end
 		end	
 		
-		#2 multi longueurs 
-		
+#2 multi longueurs
 		heightIndexTab = 0
-		# 
-		# Loop on Y 
+		first_row = true # Flag to identify the first row
+
+		#
+		# Loop on Y (Height)
 		#==================
-		#while( posy < posymax)
 		while( posy < (posymax + f_heightoffset.abs)) #6.0.0
-		
+
 			#2 multi longueur
 			lengthIndexInTab = 0
-			
+
 			randomvalueY = ((2.0*rand())-1.0).inch # entre -1.0 et 1.0
-			
-			#2 TODO adapter aux multi longueurs
+
+			# Determine the height for the current row
 			if(f_tabHauteurBardage.length == 0)
-				#longueurx = f_longueurBardage
 				# V4.5 : long +- rand*longuer
 				lengthY = f_hauteurBardage*(1.0 + randomvalueY*f_randomhauteurBardage)
 			else
@@ -1939,13 +1943,13 @@ module BR_OOB
 				heightIndexTab = result[1]
 				puts "lengthY = #{lengthY}"
 			end
-			if first_row && start_row_height != "auto"
+
+			# *** SOLUTION: Override the height if it's the first row and a specific start height is selected ***
+			if first_row && start_row_height != "auto" && !start_row_height.empty?
 				lengthY = start_row_height.to_f * unitconversion
 			end
-			first_row = false	
-								
-			#lengthY = f_hauteurBardage*(1.0 + randomvalueY*f_randomhauteurBardage)
-			
+			first_row = false # Ensure this only runs for the first row
+
 			# Length X
 			#==================
 			#while( posx < posxmax)

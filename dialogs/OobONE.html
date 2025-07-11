@@ -577,26 +577,35 @@ $(document).ready(function() {
         console.log('Dropdown updated with', heightValues.length, 'options');
     }
     
-    // Update dropdown when height input changes
-    $('#input3').on('input keyup change', function() {
+    // *** FIXED: Update dropdown when height input changes - with delay and more events ***
+    $('#input3').on('input keyup change paste', function() {
         console.log('Input3 changed');
-        updateStartRowHeightDropdown();
+        setTimeout(function() {
+            updateStartRowHeightDropdown();
+        }, 100); // Small delay to ensure value is updated
     });
     
     // Handle dropdown selection change
     $('#startRowHeight').on('change', function() {
         var selectedValue = $(this).val();
-        console.log('Dropdown selection changed to:', selectedValue);
+        console.log('*** DEBUG: Dropdown selection changed to:', selectedValue);
+        console.log('*** DEBUG: Dropdown has', $('#startRowHeight option').length, 'options');
         
-        if (!selectedValue) return;
+        if (!selectedValue) {
+            console.log('*** DEBUG: No value selected, returning');
+            return;
+        }
         
         // Get current height values
         var heightValue = $('#input3').val();
+        console.log('*** DEBUG: Current input3 value:', heightValue);
         if (!heightValue || heightValue.trim() === '') return;
         
         var heightValues = heightValue.split(';')
             .map(function(val) { return val.trim(); })
             .filter(function(val) { return val !== '' && val !== '0' && val !== '0.0'; });
+        
+        console.log('*** DEBUG: Height values before reorder:', heightValues);
         
         // Remove selected value from its current position
         heightValues = heightValues.filter(function(val) { return val !== selectedValue; });
@@ -604,17 +613,41 @@ $(document).ready(function() {
         // Add selected value to the beginning
         heightValues.unshift(selectedValue);
         
+        console.log('*** DEBUG: Height values after reorder:', heightValues);
+        
         // Update input3 with new order (semicolon-separated)
         $('#input3').val(heightValues.join(';'));
         
-        console.log('Updated input3 to:', heightValues.join(';'));
+        console.log('*** DEBUG: Updated input3 to:', heightValues.join(';'));
         
         // Update dropdown to reflect new order
-        updateStartRowHeightDropdown();
+        setTimeout(function() {
+            updateStartRowHeightDropdown();
+        }, 50);
     });
     
-    // Initial population
-    updateStartRowHeightDropdown();
+    // *** FIXED: Also update when setValue is called from Ruby ***
+    // Override the setValue function to catch Ruby updates
+    var originalSetValue = window.setValue;
+    window.setValue = function(msg) {
+        if (originalSetValue) {
+            originalSetValue(msg);
+        }
+        
+        // Check if this setValue call was for input3
+        var parts = msg.split(';');
+        if (parts[0] === 'input3') {
+            console.log('setValue called for input3, updating dropdown');
+            setTimeout(function() {
+                updateStartRowHeightDropdown();
+            }, 200); // Longer delay for Ruby setValue calls
+        }
+    };
+    
+    // Initial population with delay
+    setTimeout(function() {
+        updateStartRowHeightDropdown();
+    }, 500);
     
     console.log('Starting Row Height control initialized');
 });
